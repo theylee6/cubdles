@@ -34,10 +34,12 @@ type Row = {
 /** Active plans with prices and entitlements, read from the database (never hardcoded). Cached for an hour. */
 export async function getActivePlans(): Promise<PlansResult> {
   "use cache";
-  cacheLife("hours");
   cacheTag("plans");
 
-  if (!isSupabaseConfigured()) return { status: "unconfigured" };
+  if (!isSupabaseConfigured()) {
+    cacheLife("hours");
+    return { status: "unconfigured" };
+  }
 
   const supabase = createAnonClient();
   const { data, error } = await supabase
@@ -46,10 +48,12 @@ export async function getActivePlans(): Promise<PlansResult> {
     .order("sort_order");
 
   if (error || !data) {
-    console.error("getActivePlans failed", error?.code);
+    console.error("getActivePlans failed", error?.code ?? error?.message);
+    cacheLife("seconds"); // don't keep serving a failure; retry soon
     return { status: "error" };
   }
 
+  cacheLife("hours");
   return { status: "ok", plans: (data as Row[]).map(toPlan) };
 }
 

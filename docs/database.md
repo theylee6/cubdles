@@ -38,6 +38,12 @@ Storage bucket `profile-photos` is private: files under `<user_id>/…`; owners 
 - Functions: `reorder_photos(uuid[])`, `next_photo_position()`, `compact_photo_positions()`, `set_profile_interests(smallint[])`, `set_profile_prompts(jsonb)` — each replaces data atomically and checks ownership.
 - `complete_onboarding()` now also requires gender group, who-to-meet, affection profile (cuddle style, pace, touch comfort) and at least one prompt.
 
+## Migration 3 — hardening (2026-11-18, from Supabase advisors)
+
+- Policy helpers (`can_view_profile`, `is_blocked_between`, `has_staff_role`, `is_staff`) moved to a `private` schema the API does not expose. Before this, any signed-in user could call `/rpc/is_blocked_between` to learn whether two other members had blocked each other.
+- Every policy uses `(select auth.uid())` so it is evaluated once per statement, not per row.
+- Fixed `search_path` on the remaining functions; indexes on three foreign keys.
+
 ## Coming in later migrations
 
 Matching (`likes`, `passes`, `matches`, `daily_picks`, `compatibility_config`), messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

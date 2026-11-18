@@ -91,3 +91,13 @@ select public.set_profile_prompts('[{"prompt_id": 5, "answer": "Sunlight through
 select tests.lives('select public.complete_onboarding()', 'onboarding completes once every requirement is met');
 select tests.throws('select public.complete_onboarding()', 'onboarding cannot be completed twice');
 reset role;
+
+-- ---------- migration 3: helper functions are not callable through the API ----------
+select tests.ok(not exists (
+  select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and p.proname in ('is_blocked_between', 'can_view_profile', 'has_staff_role', 'is_staff')
+), 'policy helper functions are no longer in the API-exposed public schema');
+select tests.ok(not has_function_privilege('anon', 'private.is_blocked_between(uuid, uuid)', 'execute'), 'anonymous visitors cannot call private helpers');
+select tests.ok((select count(*) from pg_policies where schemaname = 'public' and (qual like '%auth.uid()%' or with_check like '%auth.uid()%')
+                 and not (coalesce(qual, '') like '%SELECT auth.uid()%' or coalesce(with_check, '') like '%SELECT auth.uid()%')) = 0,
+  'every policy evaluates auth.uid() once per statement');

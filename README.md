@@ -28,7 +28,7 @@ The site runs without Supabase configured: public pages work, and anything that 
 2. Install the [Supabase CLI](https://supabase.com/docs/guides/cli), then from this folder:
    ```bash
    supabase init            # creates supabase/config.toml (keep our migrations folder)
-   supabase link --project-ref <staging-ref>
+   supabase link --project-ref babfmifxyjmesfebzewa   # the "cuddles" project
    supabase db push         # applies supabase/migrations/*
    ```
    Load development catalogue and placeholder plans on **staging only**: run `supabase/seed.sql` in the SQL editor. Never run the seed on production — set real prices in the admin dashboard (M5) or the SQL editor.
@@ -46,7 +46,7 @@ The site runs without Supabase configured: public pages work, and anything that 
    ```sql
    insert into public.staff_roles (user_id, role) select id, 'admin' from auth.users where email = 'you@example.com';
    ```
-8. Copy the project URL, anon key and service-role key into `.env.local` (and into Vercel).
+8. Copy the project URL, the **publishable** key (`sb_publishable_…`) and the **secret** key into `.env.local` and Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 
 ## Deploying to Vercel (requires your account)
 

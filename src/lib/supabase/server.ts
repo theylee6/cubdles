@@ -4,6 +4,7 @@ import { createClient as createPlainClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { supabaseCredentials } from "@/lib/env";
 import { serverEnv } from "@/lib/env.server";
+import type { Database } from "./database.types";
 
 /**
  * Supabase client for Server Components, Server Actions and Route Handlers.
@@ -13,7 +14,7 @@ export async function createClient() {
   const { url, anonKey } = supabaseCredentials();
   const cookieStore = await cookies();
 
-  return createServerClient(url, anonKey, {
+  return createServerClient<Database>(url, anonKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -36,7 +37,7 @@ export async function createClient() {
  */
 export function createAnonClient() {
   const { url, anonKey } = supabaseCredentials();
-  return createPlainClient(url, anonKey, {
+  return createPlainClient<Database>(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -51,7 +52,7 @@ export function createServiceClient() {
   if (!key) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set (see README).");
   }
-  return createPlainClient(url, key, {
+  return createPlainClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }

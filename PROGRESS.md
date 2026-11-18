@@ -1,6 +1,13 @@
 # Cubdles — development progress
 
-Last updated: 2026-11-18 (profile set-up added). Defaults D2–D10 from the Phase 1 plan are assumed (India launch, romantic only, mutual-match messaging) until the owner says otherwise.
+Last updated: 2026-11-18 (Supabase project connected).
+
+## Supabase project
+
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo). Migrations 1–3 applied; interests and prompts loaded; no placeholder prices.
+- Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
+- Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
+- Still to configure in the dashboard: Auth URLs, email templates, Google/Apple providers, SMTP (see README). Defaults D2–D10 from the Phase 1 plan are assumed (India launch, romantic only, mutual-match messaging) until the owner says otherwise.
 
 ## Milestone status
 
@@ -38,7 +45,7 @@ Last updated: 2026-11-18 (profile set-up added). Defaults D2–D10 from the Phas
 2. Photo moderation: automated scan provider + moderator queue (M5). Until then photos stay `pending` and need approving in the database.
 3. Phone OTP (needs SMS provider + DLT registration).
 4. Rate limiting (Upstash) on sign-up, login, contact form and uploads.
-5. Generated TypeScript types for the database (`supabase gen types`) once a project exists.
+5. Regenerate `src/lib/supabase/database.types.ts` after every migration.
 
 ## Known issues / limitations
 

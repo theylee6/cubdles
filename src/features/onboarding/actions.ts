@@ -7,8 +7,9 @@ import { fieldErrors, type FormState } from "@/lib/auth/schemas";
 import { getSessionUser } from "@/lib/auth/session";
 import { isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
 import { dbErrorKey, ERROR_STEP, friendlyDbError } from "./errors";
-import { CITIES, GENDER_GROUPS, LIFESTYLE_FIELDS, nearestCity } from "./options";
+import { CITIES, GENDER_GROUPS, LIFESTYLE_FIELDS, nearestCity, type LifestyleKey } from "./options";
 import {
   aboutSchema,
   affectionSchema,
@@ -22,7 +23,7 @@ import {
 } from "./schemas";
 import { nextStepSlug, stepHref, stepNumber, type StepSlug } from "./steps";
 
-type Ctx = { supabase: SupabaseClient; userId: string };
+type Ctx = { supabase: SupabaseClient<Database>; userId: string };
 
 /**
  * Shared shape of every step action:
@@ -55,7 +56,7 @@ async function runStep<S extends z.ZodType>(
 }
 
 /** Moves progress forward (a DB trigger stops it ever moving back). */
-async function markStepComplete(supabase: SupabaseClient, userId: string, slug: StepSlug) {
+async function markStepComplete(supabase: SupabaseClient<Database>, userId: string, slug: StepSlug) {
   await supabase.from("profiles").update({ onboarding_step: stepNumber(slug) }).eq("id", userId);
 }
 
@@ -169,7 +170,10 @@ export async function saveInterests(_prev: FormState, formData: FormData): Promi
   const input: Record<string, unknown> = { interestIds: formData.getAll("interestIds") };
   for (const key of Object.keys(LIFESTYLE_FIELDS)) input[key] = formData.get(key) ?? "";
   return runStep("interests", interestsSchema, input, async (data, { supabase, userId }) => {
-    const lifestyle = Object.fromEntries(Object.keys(LIFESTYLE_FIELDS).map((k) => [k, (data as Record<string, unknown>)[k] ?? null]));
+    const answers = data as Record<LifestyleKey, string | undefined>;
+    const lifestyle = Object.fromEntries(
+      (Object.keys(LIFESTYLE_FIELDS) as LifestyleKey[]).map((k) => [k, answers[k] ?? null]),
+    ) as Record<LifestyleKey, string | null>;
     const [a, b] = await Promise.all([
       supabase.rpc("set_profile_interests", { p_ids: data.interestIds }),
       supabase.from("lifestyle").update(lifestyle).eq("profile_id", userId),
@@ -178,7 +182,7 @@ export async function saveInterests(_prev: FormState, formData: FormData): Promi
   });
 }
 
-/** The photos step has its own upload actions (./photo-actions); this just checks the minimum and moves on. */
+/** The photos step has its own upload actions (features/photos/actions); this just checks the minimum and moves on. */
 export async function continueFromPhotos(_prev: FormState, _formData: FormData): Promise<FormState> {
   void _formData;
   return runStep("photos", z.object({}), {}, async (_data, { supabase, userId }) => {

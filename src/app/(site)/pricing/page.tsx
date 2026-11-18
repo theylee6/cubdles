@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Check, Minus } from "lucide-react";
 import { PageHero } from "@/components/site/page-parts";
 import { ButtonLink } from "@/components/ui/button";
@@ -18,9 +19,7 @@ const ALWAYS_FREE = [
   "Blocking, reporting and every safety feature",
 ];
 
-export default async function PricingPage() {
-  const result = await getActivePlans();
-
+export default function PricingPage() {
   return (
     <>
       <PageHero
@@ -41,15 +40,9 @@ export default async function PricingPage() {
           </ul>
         </Card>
 
-        {result.status === "ok" && result.plans.length > 0 ? (
-          <PlanGrid plans={result.plans} />
-        ) : (
-          <Notice title="Membership prices aren't published yet">
-            {result.status === "error"
-              ? "We couldn't load prices just now. Please refresh in a moment."
-              : "Paid plans will appear here once they're set up. Everything above is free in the meantime."}
-          </Notice>
-        )}
+        <Suspense fallback={<div className="h-72 animate-pulse rounded-[var(--radius-card)] bg-linen" aria-label="Loading prices" />}>
+          <Plans />
+        </Suspense>
 
         <p className="text-sm text-mocha">
           Prices include applicable taxes unless shown otherwise. Memberships renew automatically and you can cancel any
@@ -58,6 +51,19 @@ export default async function PricingPage() {
         </p>
       </Container>
     </>
+  );
+}
+
+/** Prices come from the database; streamed so a slow or failed lookup never blocks the page. */
+async function Plans() {
+  const result = await getActivePlans();
+  if (result.status === "ok" && result.plans.length > 0) return <PlanGrid plans={result.plans} />;
+  return (
+    <Notice title="Membership prices aren't published yet">
+      {result.status === "error"
+        ? "We couldn't load prices just now. Please refresh in a moment."
+        : "Paid plans will appear here once they're set up. Everything above is free in the meantime."}
+    </Notice>
   );
 }
 

@@ -1,6 +1,14 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { CuddleStyle, GenderGroup, Intention, LoveLanguage, Pace } from "./options";
+import { GENDER_GROUPS, LOVE_LANGUAGES, type CuddleStyle, type GenderGroup, type Intention, type LoveLanguage, type Pace } from "./options";
+
+/** Text columns with CHECK constraints come back as `string`; narrow them to the known values. */
+function oneOf<T extends string>(allowed: readonly { value: T }[], v: string | null | undefined): T | null {
+  return allowed.some((o) => o.value === v) ? (v as T) : null;
+}
+function manyOf<T extends string>(allowed: readonly { value: T }[], vs: string[] | null | undefined): T[] {
+  return (vs ?? []).filter((v): v is T => allowed.some((o) => o.value === v));
+}
 
 export const PHOTO_URL_TTL_SECONDS = 60 * 60;
 
@@ -68,7 +76,7 @@ export async function loadOnboardingData(userId: string): Promise<OnboardingData
       statusReason: p.status_reason,
       onboardingStep: p.onboarding_step,
       displayName: p.display_name,
-      genderGroup: p.gender_group,
+      genderGroup: oneOf(GENDER_GROUPS, p.gender_group),
       genderIdentity: p.gender_identity,
       pronouns: p.pronouns,
       intention: p.intention,
@@ -86,14 +94,14 @@ export async function loadOnboardingData(userId: string): Promise<OnboardingData
       ageMin: prefs.data?.age_min ?? 21,
       ageMax: prefs.data?.age_max ?? 40,
       maxDistanceKm: prefs.data?.max_distance_km ?? 25,
-      showGenders: prefs.data?.show_genders ?? [],
+      showGenders: manyOf(GENDER_GROUPS, prefs.data?.show_genders),
     },
     affection: {
       cuddleStyle: aff.data?.cuddle_style ?? null,
       pace: aff.data?.pace ?? null,
       touchComfort: aff.data?.touch_comfort ?? null,
       publicAffection: aff.data?.public_affection ?? null,
-      loveLanguages: aff.data?.love_languages ?? [],
+      loveLanguages: manyOf(LOVE_LANGUAGES, aff.data?.love_languages),
     },
     lifestyle: life.data ?? {},
     interestIds: (interests.data ?? []).map((r) => r.interest_id),
