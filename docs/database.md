@@ -31,6 +31,13 @@ Postgres on Supabase, with PostGIS. Migrations live in `supabase/migrations` and
 
 Storage bucket `profile-photos` is private: files under `<user_id>/…`; owners upload/delete in their folder; others can read a file only if its `photos` row is approved and the owner is visible.
 
+## Migration 2 — profile set-up (2026-11-18)
+
+- `profiles.gender_group` (`woman` / `man` / `nonbinary`) for matching; `gender_identity` stays free text for display. `preferences.show_genders` must use the same set.
+- Trigger keeps `onboarding_step` from moving backwards.
+- Functions: `reorder_photos(uuid[])`, `next_photo_position()`, `compact_photo_positions()`, `set_profile_interests(smallint[])`, `set_profile_prompts(jsonb)` — each replaces data atomically and checks ownership.
+- `complete_onboarding()` now also requires gender group, who-to-meet, affection profile (cuddle style, pace, touch comfort) and at least one prompt.
+
 ## Coming in later migrations
 
 Matching (`likes`, `passes`, `matches`, `daily_picks`, `compatibility_config`), messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

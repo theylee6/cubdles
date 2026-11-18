@@ -74,3 +74,16 @@ test("pricing never shows hardcoded prices when no plans are configured", async 
   const plans = page.getByRole("list", { name: /prices$/ });
   await expect(notice.or(plans.first())).toBeVisible();
 });
+
+test("profile set-up requires signing in", async ({ page }) => {
+  for (const path of ["/onboarding", "/onboarding/photos"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/login\?next=%2Fonboarding/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/welcome back/i);
+  }
+});
+
+test("unknown onboarding steps are 404s", async ({ page }) => {
+  const res = await page.goto("/onboarding/not-a-step");
+  expect(res?.status()).toBe(404);
+});

@@ -58,6 +58,7 @@ async function MemberPanel() {
 
   const { data: profile } = await supabase.from("profiles").select("status, status_reason, display_name").eq("id", userId).single();
   const status = profile?.status ?? "onboarding";
+  if (status === "onboarding" && profile?.status_reason !== "age_gate") redirect("/onboarding");
 
   if (status === "suspended" && profile?.status_reason === "age_gate") {
     return (
@@ -76,8 +77,8 @@ async function MemberPanel() {
         <Card className="flex flex-col gap-3">
           <h2 className="text-xl">Coming next</h2>
           <p className="text-mocha">
-            Profile set-up, discovery and messaging are being built now. This page will become your home for all of
-            them. We&rsquo;ll email you when your profile can be completed.
+            Your profile is saved. Discovery and messaging are being built now, and this page will become your home for
+            them. Photos marked &ldquo;in review&rdquo; become visible once our team approves them.
           </p>
         </Card>
       </div>

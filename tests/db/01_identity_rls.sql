@@ -113,7 +113,10 @@ select tests.throws('select public.complete_onboarding()', 'onboarding cannot fi
 select public.accept_terms(false);
 select public.set_location(12.971598, 77.594566, 'Bengaluru');
 select tests.ok((select extensions.st_y(location::extensions.geometry) from public.profile_private) = 12.97, 'location is rounded to about 1 km before storage');
-update public.profiles set display_name = 'Chitra', gender_identity = 'woman', intention = 'figuring_out';
+update public.profiles set display_name = 'Chitra', gender_identity = 'woman', gender_group = 'woman', intention = 'figuring_out';
+update public.preferences set show_genders = '{man}';
+update public.affection_profiles set cuddle_style = 'little_spoon', pace = 'slow', touch_comfort = 4;
+select public.set_profile_prompts('[{"prompt_id": 1, "answer": "Chai and a long book."}]');
 insert into public.photos (profile_id, storage_path, position) values
   ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000c/0.jpg', 0),
   ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000c/1.jpg', 1);

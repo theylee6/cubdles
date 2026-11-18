@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, supabaseCredentials } from "@/lib/env";
+import { isStepSlug } from "@/features/onboarding/steps";
 
 /** Paths that require a signed-in user. Real authorisation still happens on the server and in RLS. */
 const PROTECTED_PREFIXES = ["/app", "/onboarding"];
@@ -10,6 +11,12 @@ const PROTECTED_PREFIXES = ["/app", "/onboarding"];
  * redirect for protected pages. This is not the security boundary — RLS is.
  */
 export async function proxy(request: NextRequest) {
+  // Unknown onboarding steps are a hard 404 (Cache Components streams pages, so the page itself can't set the status).
+  const stepMatch = request.nextUrl.pathname.match(/^\/onboarding\/([^/]+)\/?$/);
+  if (stepMatch && !isStepSlug(decodeURIComponent(stepMatch[1]))) {
+    return NextResponse.rewrite(new URL("/_not-found", request.url), { status: 404 });
+  }
+
   let response = NextResponse.next({ request });
   if (!isSupabaseConfigured()) return response;
 
