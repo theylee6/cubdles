@@ -104,3 +104,9 @@ test("the purge job refuses requests without the cron secret", async ({ request 
   const res = await request.get("/api/cron/purge-accounts");
   expect(res.status()).toBe(401);
 });
+
+test("safety page explains country advisories and background checks", async ({ page }) => {
+  await page.goto("/safety");
+  await expect(page.locator("#travel-and-local-laws")).toBeVisible();
+  await expect(page.locator("#background-checks")).toBeVisible();
+});

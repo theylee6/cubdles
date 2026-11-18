@@ -666,6 +666,7 @@ export type Database = {
       get_daily_picks: { Args: never; Returns: { profile_id: string; reasons: Json; score: number }[] }
       likes_received_summary: { Args: never; Returns: Json }
       my_features: { Args: never; Returns: Json }
+      my_safety_advisory: { Args: never; Returns: Json }
       set_incognito: { Args: { p_on: boolean }; Returns: undefined }
       profile_cards: { Args: { p_ids: string[] }; Returns: Json }
       request_account_deletion: { Args: never; Returns: undefined }

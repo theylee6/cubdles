@@ -70,6 +70,14 @@ Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `l
 | `search_cities()`, `set_location(lat, lng, city_id, timezone)`, `set_timezone()` | City search; server-side city/country resolution; travel updates |
 | `private.member_timezone/member_today/period_start` | Quotas and daily picks in local time |
 
+## Migration 7 — country advisories (2026-11-18)
+
+| Object | Purpose |
+| --- | --- |
+| `country_rules.advisory`, `country_rules.reviewed_on` | Safety advisory per country (65 rows, reviewed yearly) |
+| `my_safety_advisory()` | The signed-in member's advisory, or null |
+| `private.has_feature` | Incognito is free where `advisory = 'same_sex_criminalised'` |
+
 ## Coming in later migrations
 
 Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

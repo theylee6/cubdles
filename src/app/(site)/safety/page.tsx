@@ -65,6 +65,15 @@ export default function SafetyPage() {
             verified badge means a live selfie matched the person&rsquo;s photos — nothing more. Please take the same care
             you would with anyone you meet for the first time.
           </p>
+          <h2 id="travel-and-local-laws">Where same-sex relationships are against the law</h2>
+          <p>
+            Cubdles is open to everyone, but in some countries same-sex relationships are still a crime. If you live in or
+            travel to one of them, we show you a reminder and make Incognito free, so only people you&rsquo;ve liked can see
+            you. Choose photos that don&rsquo;t identify where you live or work, be wary of anyone who pushes to move the
+            chat elsewhere or asks for money, and tell a friend where you&rsquo;re going. Our list follows the{" "}
+            <a href="https://www.humandignitytrust.org/lgbt-the-law/map-of-criminalisation/">Human Dignity Trust</a> and{" "}
+            <a href="https://ilga.org/">ILGA World</a>, and we review it at least once a year.
+          </p>
           <h2>If something goes wrong</h2>
           <p>
             Report the person from their profile or your chat — it&rsquo;s confidential. For anything urgent or that
