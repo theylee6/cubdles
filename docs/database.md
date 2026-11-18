@@ -44,9 +44,25 @@ Storage bucket `profile-photos` is private: files under `<user_id>/…`; owners 
 - Every policy uses `(select auth.uid())` so it is evaluated once per statement, not per row.
 - Fixed `search_path` on the remaining functions; indexes on three foreign keys.
 
+## Migration 4 — matching (2026-11-18)
+
+| Table | Purpose | Client access |
+| --- | --- | --- |
+| `likes` | like / super like, optional note (premium) | read own sent; received only with `see_likes`; writes via `swipe()` |
+| `passes` | not-now decisions | read own; writes via `swipe()` |
+| `matches` | one row per pair (`user_a < user_b`), ended with a reason | participants read; writes via functions |
+| `daily_picks` | top 5 per member per day (India time) | read own |
+| `compatibility_config` | versioned scoring weights | none (admin only) |
+
+Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `likes_received_summary`, `get_daily_picks`, `set_paused`, `request_account_deletion`, `restore_account`, `touch_last_active`; private helpers `compatibility`, `feature_limit`, `has_feature`, `period_start`, `distance_bucket`, `on_block` (trigger: blocking ends matches and removes likes), `accounts_due_for_purge`. `can_view_profile` now also lets matched members see each other while paused.
+
+## Migration 5 — member features (2026-11-18)
+
+`my_features()` for UI gating; `is_incognito` can only change through `set_incognito()`, which checks the entitlement.
+
 ## Coming in later migrations
 
-Matching (`likes`, `passes`, `matches`, `daily_picks`, `compatibility_config`), messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.
+Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.
 
 ## Testing
 

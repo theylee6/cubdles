@@ -87,3 +87,20 @@ test("unknown onboarding steps are 404s", async ({ page }) => {
   const res = await page.goto("/onboarding/not-a-step");
   expect(res?.status()).toBe(404);
 });
+
+test("member pages require signing in", async ({ page }) => {
+  for (const path of ["/app/discover", "/app/likes", "/app/matches", "/app/me", "/app/me/edit/photos", "/app/settings"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/login\?next=/);
+  }
+});
+
+test("unknown edit sections are 404s", async ({ page }) => {
+  const res = await page.goto("/app/me/edit/birthday");
+  expect(res?.status()).toBe(404);
+});
+
+test("the purge job refuses requests without the cron secret", async ({ request }) => {
+  const res = await request.get("/api/cron/purge-accounts");
+  expect(res.status()).toBe(401);
+});

@@ -165,6 +165,60 @@ export type Database = {
         Update: { active?: boolean; category?: string; id?: never; label?: string; slug?: string }
         Relationships: []
       }
+      likes: {
+        Row: { created_at: string; from_id: string; kind: Database["public"]["Enums"]["like_kind"]; note: string | null; to_id: string }
+        Insert: { created_at?: string; from_id: string; kind?: Database["public"]["Enums"]["like_kind"]; note?: string | null; to_id: string }
+        Update: { created_at?: string; from_id?: string; kind?: Database["public"]["Enums"]["like_kind"]; note?: string | null; to_id?: string }
+        Relationships: []
+      }
+      passes: {
+        Row: { created_at: string; from_id: string; to_id: string }
+        Insert: { created_at?: string; from_id: string; to_id: string }
+        Update: { created_at?: string; from_id?: string; to_id?: string }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          ended_by: string | null
+          ended_reason: Database["public"]["Enums"]["match_end_reason"] | null
+          id: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          ended_by?: string | null
+          ended_reason?: Database["public"]["Enums"]["match_end_reason"] | null
+          id?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          ended_by?: string | null
+          ended_reason?: Database["public"]["Enums"]["match_end_reason"] | null
+          id?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
+      daily_picks: {
+        Row: { pick_date: string; pick_id: string; rank: number; reasons: Json; score: number; user_id: string }
+        Insert: { pick_date: string; pick_id: string; rank: number; reasons?: Json; score: number; user_id: string }
+        Update: { pick_date?: string; pick_id?: string; rank?: number; reasons?: Json; score?: number; user_id?: string }
+        Relationships: []
+      }
+      compatibility_config: {
+        Row: { active: boolean; created_at: string; created_by: string | null; version: number; weights: Json }
+        Insert: { active?: boolean; created_at?: string; created_by?: string | null; version?: never; weights: Json }
+        Update: { active?: boolean; created_at?: string; created_by?: string | null; version?: never; weights?: Json }
+        Relationships: []
+      }
       lifestyle: {
         Row: {
           diet: string | null
@@ -440,6 +494,8 @@ export type Database = {
         Row: {
           birth_date: string | null
           created_at: string
+          deletion_requested_at: string | null
+          status_before_deletion: Database["public"]["Enums"]["profile_status"] | null
           location: unknown
           marketing_consent: boolean
           phone_e164: string | null
@@ -600,6 +656,22 @@ export type Database = {
       age_in_years: { Args: { birth: string }; Returns: number }
       compact_photo_positions: { Args: never; Returns: undefined }
       complete_onboarding: { Args: never; Returns: undefined }
+      discover: {
+        Args: { p_filters?: Json; p_limit?: number; p_offset?: number }
+        Returns: { profile_id: string; reasons: Json; score: number }[]
+      }
+      get_daily_picks: { Args: never; Returns: { profile_id: string; reasons: Json; score: number }[] }
+      likes_received_summary: { Args: never; Returns: Json }
+      my_features: { Args: never; Returns: Json }
+      set_incognito: { Args: { p_on: boolean }; Returns: undefined }
+      profile_cards: { Args: { p_ids: string[] }; Returns: Json }
+      request_account_deletion: { Args: never; Returns: undefined }
+      restore_account: { Args: never; Returns: undefined }
+      set_paused: { Args: { p_paused: boolean }; Returns: undefined }
+      swipe: { Args: { p_action: string; p_note?: string; p_target: string }; Returns: Json }
+      touch_last_active: { Args: never; Returns: undefined }
+      undo_last_pass: { Args: never; Returns: string }
+      unmatch: { Args: { p_match_id: string }; Returns: undefined }
       next_photo_position: { Args: never; Returns: number }
       profile_age: { Args: { target: string }; Returns: number }
       reorder_photos: { Args: { p_ids: string[] }; Returns: undefined }
@@ -632,6 +704,8 @@ export type Database = {
     Enums: {
       affection_pace: "slow" | "steady" | "quick"
       cuddle_style: "big_spoon" | "little_spoon" | "either" | "not_sure"
+      like_kind: "like" | "super"
+      match_end_reason: "unmatch" | "block" | "moderation" | "account_deleted"
       moderation_status: "pending" | "approved" | "rejected"
       profile_status: "onboarding" | "active" | "paused" | "suspended" | "banned" | "deleted"
       relationship_intention: "life_partner" | "long_term" | "long_term_open" | "short_term_open" | "figuring_out"

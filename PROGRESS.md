@@ -1,10 +1,10 @@
 # Cubdles — development progress
 
-Last updated: 2026-11-18 (Supabase project connected).
+Last updated: 2026-11-18 (M3 discovery & matching, profile editing, settings).
 
 ## Supabase project
 
-- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo). Migrations 1–3 applied; interests and prompts loaded; no placeholder prices.
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–5 applied; interests and prompts loaded; no placeholder prices.
 - Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
 - Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
 - Still to configure in the dashboard: Auth URLs, email templates, Google/Apple providers, SMTP (see README). Defaults D2–D10 from the Phase 1 plan are assumed (India launch, romantic only, mutual-match messaging) until the owner says otherwise.
@@ -16,7 +16,9 @@ Last updated: 2026-11-18 (Supabase project connected).
 | M0 Setup | **Mostly done** — repo, scripts, env example, CI workflow, README. Waiting on: GitHub repo, Vercel and Supabase accounts |
 | M1 Design system + public site | **Done (temporary UI)** — the owner is designing in Figma; current UI is a placeholder layer over reusable components |
 | M2 Auth, onboarding, profiles | **Profile set-up done** — 10-step resumable onboarding, photo pipeline, affection profile, prompts, migration 2. Still to do: phone OTP, profile editing/settings, account deletion, rate limiting |
-| M3–M8 | Not started |
+| M3 Discovery + matching | **Done** — discovery (swipe + browse + filters), daily picks, transparent compatibility score, likes/super likes/passes with quotas, race-safe mutual matching, liked-you count (list is premium), matches, unmatch, block, profile pages |
+| M2 extras | **Done** — profile editing (same step forms in edit mode), privacy settings, pause, incognito (premium-gated), account deletion with 30-day restore + daily purge job |
+| M4–M8 | Not started (next: M4 messaging + notifications) |
 
 ## Completed
 
@@ -28,7 +30,7 @@ Last updated: 2026-11-18 (Supabase project connected).
 - SEO: metadata per page, sitemap, robots, web manifest, icon.
 - Auth: email+password sign-up (server-validated, 18+ and terms confirmation), login, Google/Apple OAuth, email confirm + recovery routes, password reset, sign-out, session refresh in `proxy.ts`, protected `/app`.
 - Database migration 1 with RLS on every table, column-level grants, storage bucket policies, age-gate (under-18 suspended + email blocked), location rounding, onboarding completion checks, audited staff status changes.
-- Tests: 47 unit (incl. EXIF/GPS stripping), 90 database permission, 40 end-to-end (mobile + desktop, axe WCAG 2.2 AA).
+- Tests: 54 unit, 146 database permission/behaviour, 46 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
 
 ## Profile set-up (onboarding) — how it works
 
@@ -39,9 +41,19 @@ Last updated: 2026-11-18 (Supabase project connected).
 - Location: device location rounded to 2 decimals in the browser and again in the DB, or a launch city. Only the city name is shown.
 - Dev-only preview of every step: `pnpm dev` → `/dev/onboarding` (404 in production).
 
+## Discovery and matching — how it works
+
+- `discover()` (SQL) filters by mutual gender preference, both age ranges, distance (PostGIS), approved photo, not blocked either way, not already liked/passed/matched (ever), incognito rules, then ranks by `private.compatibility()`.
+- Compatibility = weighted mix of intention, affection (pace, spoons, touch comfort, love languages), shared interests and lifestyle conflicts. Weights live in `compatibility_config` (versioned). Reasons come back as codes; `features/discovery/copy.ts` turns them into words.
+- `swipe()` takes a per-pair advisory lock so simultaneous likes always create exactly one match. Quotas: 25 likes/day and 1 super like/week on free (India time), from `entitlements` when plans exist.
+- Received likes are hidden by RLS unless the plan includes `see_likes`; free members get a count via `likes_received_summary()`.
+- Paid features (`my_features()`): see_likes, advanced_filters, undo, incognito, note_with_like, boosts — all off until subscriptions (M6). Everyone is on `free` (`private.current_plan_code`).
+- Account deletion: `request_account_deletion()` hides the profile and ends matches; `restore_account()` within 30 days returns to the exact previous status (a suspension can't be lifted this way); `/api/cron/purge-accounts` (Vercel Cron, daily 03:00 IST, needs `CRON_SECRET`) removes photos and deletes the auth user.
+- Dev-only previews: `/dev/onboarding`, `/dev/discovery`.
+
 ## Pending (next up)
 
-1. Profile editing and settings (reuse the step components and `PhotoManager`), privacy settings, account deletion workflow.
+1. M4: real-time messaging (conversations created on match), notifications, reporting.
 2. Photo moderation: automated scan provider + moderator queue (M5). Until then photos stay `pending` and need approving in the database.
 3. Phone OTP (needs SMS provider + DLT registration).
 4. Rate limiting (Upstash) on sign-up, login, contact form and uploads.
@@ -52,8 +64,10 @@ Last updated: 2026-11-18 (Supabase project connected).
 - **Contact form has no rate limiting yet** (honeypot only). Add Upstash before launch.
 - **Legal pages are drafts** and need a lawyer's review (D8). Grievance Officer details not published.
 - **Signed-in `/app` page is an interim home**: it says plainly that profile set-up is coming next.
-- `profiles.is_incognito` is owner-editable; the premium entitlement check will move it behind a function in M6.
 - Database tests use a minimal Supabase stub (`tests/db/_supabase_stub.sql`); also run them against a real Supabase project (`supabase test db`) once one exists.
 - **The full signed-in onboarding journey hasn't been run end to end yet**: it needs a real Supabase project (auth + storage). SQL rules, validation and photo processing are tested separately. Add a Playwright journey against staging once it exists.
 - Names ending in a dotted word (e.g. "St.John") are rejected by the anti-link rule; rare, but worth revisiting.
 - Photos use plain `<img>` with signed URLs; switch to an image CDN / `next/image` loader in M8.
+- Discovery scores every eligible candidate per request. Fine for launch-city scale; at larger scale, precompute scores (materialised candidate table refreshed by a job).
+- Swipe deck re-queries from offset 0 when it runs low (offsets shift as people are liked/passed); browse uses offsets and may show a person twice after acting on them.
+- Reporting a profile isn't built yet (M5); blocking is available everywhere.

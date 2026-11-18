@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
@@ -35,7 +36,11 @@ async function runStep<S extends z.ZodType>(
   schema: S,
   input: unknown,
   handler: (data: z.output<S>, ctx: Ctx) => Promise<FormState | void>,
+  formData?: FormData,
 ): Promise<FormState> {
+  // "edit" = changing a finished profile (Me → Edit); same validation and writes, different gate and destination.
+  const mode = formData?.get("_mode") === "edit" ? "edit" : "onboarding";
+  if (mode === "edit" && (slug === "birthday" || slug === "review")) redirect("/app/me");
   if (!isSupabaseConfigured()) return { ok: false, message: "Accounts aren't connected yet." };
   const user = await getSessionUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(stepHref(slug))}`);
@@ -45,10 +50,16 @@ async function runStep<S extends z.ZodType>(
 
   const supabase = await createClient();
   const { data: profile } = await supabase.from("profiles").select("status").eq("id", user.id).single();
-  if (profile?.status !== "onboarding") redirect("/app");
+  const allowed = mode === "edit" ? ["active", "paused"] : ["onboarding"];
+  if (!profile || !allowed.includes(profile.status)) redirect("/app");
 
   const result = await handler(parsed.data, { supabase, userId: user.id });
   if (result) return result;
+
+  if (mode === "edit") {
+    revalidatePath("/app/me");
+    redirect(`/app/me?saved=${slug}`);
+  }
 
   await markStepComplete(supabase, user.id, slug);
   const next = nextStepSlug(slug);
@@ -82,7 +93,7 @@ export async function saveBirthday(_prev: FormState, formData: FormData): Promis
     const { data: adult, error } = await supabase.rpc("submit_birth_date", { p_birth_date: data.birthDate });
     if (error) return fail(error);
     if (adult === false) redirect("/app"); // account is now suspended; /app explains why
-  });
+  }, formData);
 }
 
 export async function saveBasics(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -98,7 +109,7 @@ export async function saveBasics(_prev: FormState, formData: FormData): Promise<
       })
       .eq("id", userId);
     if (error) return fail(error);
-  });
+  }, formData);
 }
 
 export async function saveLookingFor(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -117,7 +128,7 @@ export async function saveLookingFor(_prev: FormState, formData: FormData): Prom
         .eq("profile_id", userId),
     ]);
     if (a.error || b.error) return fail(a.error ?? b.error);
-  });
+  }, formData);
 }
 
 export async function saveLocation(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -140,7 +151,7 @@ export async function saveLocation(_prev: FormState, formData: FormData): Promis
       supabase.from("preferences").update({ max_distance_km: data.distanceKm }).eq("profile_id", userId),
     ]);
     if (loc.error || pref.error) return fail(loc.error ?? pref.error);
-  });
+  }, formData);
 }
 
 export async function saveAffection(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -163,7 +174,7 @@ export async function saveAffection(_prev: FormState, formData: FormData): Promi
       })
       .eq("profile_id", userId);
     if (error) return fail(error);
-  });
+  }, formData);
 }
 
 export async function saveInterests(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -179,7 +190,7 @@ export async function saveInterests(_prev: FormState, formData: FormData): Promi
       supabase.from("lifestyle").update(lifestyle).eq("profile_id", userId),
     ]);
     if (a.error || b.error) return fail(a.error ?? b.error);
-  });
+  }, formData);
 }
 
 /** The photos step has its own upload actions (features/photos/actions); this just checks the minimum and moves on. */
@@ -201,7 +212,7 @@ export async function savePrompts(_prev: FormState, formData: FormData): Promise
       p_answers: data.answers.map((a) => ({ prompt_id: a.promptId, answer: a.answer })),
     });
     if (error) return fail(error);
-  });
+  }, formData);
 }
 
 export async function saveAbout(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -211,7 +222,7 @@ export async function saveAbout(_prev: FormState, formData: FormData): Promise<F
       .update({ bio: data.bio, job_title: data.jobTitle, education: data.education })
       .eq("id", userId);
     if (error) return fail(error);
-  });
+  }, formData);
 }
 
 export type FinishState = FormState & { fixStep?: string };

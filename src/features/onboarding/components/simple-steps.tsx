@@ -34,15 +34,21 @@ import {
   type Pace,
 } from "../options";
 import { FormMessage } from "./step-shell";
+import { useStepMode } from "./step-mode";
 
 const errorProps = (e: Record<string, string>, name: string) =>
   e[name] ? { "aria-invalid": true as const, "aria-describedby": `${name}-error` } : {};
 
-export function Continue({ pending, label = "Continue" }: { pending: boolean; label?: string }) {
+/** Submit button for every step. In edit mode it also marks the form so the action saves and returns to the profile. */
+export function Continue({ pending, label }: { pending: boolean; label?: string }) {
+  const mode = useStepMode();
   return (
-    <Button type="submit" size="lg" disabled={pending} aria-busy={pending} className="w-full sm:w-auto">
-      {pending ? "Saving…" : label}
-    </Button>
+    <>
+      {mode === "edit" ? <input type="hidden" name="_mode" value="edit" /> : null}
+      <Button type="submit" size="lg" disabled={pending} aria-busy={pending} className="w-full sm:w-auto">
+        {pending ? "Saving…" : (label ?? (mode === "edit" ? "Save changes" : "Continue"))}
+      </Button>
+    </>
   );
 }
 

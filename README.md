@@ -48,11 +48,16 @@ The site runs without Supabase configured: public pages work, and anything that 
    ```
 8. Copy the project URL, the **publishable** key (`sb_publishable_…`) and the **secret** key into `.env.local` and Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 
+## Development previews
+
+`pnpm dev`, then open `/dev/onboarding` or `/dev/discovery` to see screens with sample data (404 in production). Useful when translating Figma designs.
+
 ## Deploying to Vercel (requires your account)
 
 1. Push this repo to GitHub and import it in Vercel.
 2. Add the environment variables from `.env.example` for **Preview** (staging Supabase) and **Production** (prod Supabase).
 3. Set `NEXT_PUBLIC_SITE_URL` to the real domain in Production.
+4. Set `CRON_SECRET` (32+ random characters). `vercel.json` schedules the daily account purge; Vercel sends the secret automatically.
 
 ## Scripts
 
