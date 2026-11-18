@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* =============================================================================
+   Cubdles design tokens — "Linen & Clay"
+   Contrast checked: white on clay 5.7:1, clay on cream 5.4:1, on linen 4.9:1, on blush-soft 4.7:1, mocha on cream 5.7:1,
+   cocoa on cream 14:1. Sage is for fills/icons only (2.7:1 — not for text).
+   ============================================================================= */
+@theme {
+  --color-cream: #fbf7f2;
+  --color-linen: #f3ece3;
+  --color-oat: #e4d9cc;
+  --color-blush: #ebc9bd;
+  --color-blush-soft: #f6e4dc;
+  --color-peach: #f2bfa4;
+  --color-clay: #a04f37;
+  --color-clay-deep: #8e4530;
+  --color-sage: #8e9f84;
+  --color-sage-soft: #e3e8de;
+  --color-cocoa: #2e2522;
+  --color-mocha: #6e5f58;
+  --color-alert: #b5413b;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-input: 12px;
+  --radius-card: 20px;
+  --radius-sheet: 28px;
+
+  --shadow-card: 0 1px 2px rgb(46 37 34 / 0.04), 0 8px 24px rgb(46 37 34 / 0.06);
+  --shadow-float: 0 2px 6px rgb(46 37 34 / 0.06), 0 18px 48px rgb(46 37 34 / 0.12);
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--color-cream);
+    color: var(--color-cocoa);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01";
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 100, "WONK" 0;
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: var(--color-blush);
+    color: var(--color-cocoa);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 3px;
+    border-radius: 8px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
