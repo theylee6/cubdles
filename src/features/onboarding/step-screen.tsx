@@ -8,7 +8,7 @@ import { PhotosStep } from "./components/photos-step";
 import { PromptsStep } from "./components/prompts-step";
 import { ReviewStep, type ReviewSummary } from "./components/review-step";
 import { StepShell } from "./components/step-shell";
-import { CUDDLE_STYLES, GENDER_GROUPS, INTENTIONS, LOVE_LANGUAGES, PACES, SHOW_ME, labelFor } from "./options";
+import { countryName, CUDDLE_STYLES, GENDER_GROUPS, INTENTIONS, LOVE_LANGUAGES, PACES, SHOW_ME, labelFor } from "./options";
 import { ageOn } from "./schemas";
 import { canVisit, currentStepSlug, stepHref, type StepSlug } from "./steps";
 
@@ -35,7 +35,7 @@ async function renderStep(slug: StepSlug, userId: string, d: OnboardingData) {
     case "looking-for":
       return <LookingForStep intention={d.profile.intention} showGenders={d.preferences.showGenders} ageMin={d.preferences.ageMin} ageMax={d.preferences.ageMax} />;
     case "location":
-      return <LocationStep city={d.profile.city} maxDistanceKm={d.preferences.maxDistanceKm} />;
+      return <LocationStep city={d.profile.city} country={countryName(d.profile.countryCode)} maxDistanceKm={d.preferences.maxDistanceKm} unit={d.preferences.distanceUnit} />;
     case "affection":
       return <AffectionStep {...d.affection} />;
     case "interests": {

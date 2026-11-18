@@ -392,6 +392,7 @@ export type Database = {
           age_max: number
           age_min: number
           dealbreakers: Json
+          distance_unit: string
           intentions: Database["public"]["Enums"]["relationship_intention"][]
           max_distance_km: number
           profile_id: string
@@ -496,6 +497,7 @@ export type Database = {
           created_at: string
           deletion_requested_at: string | null
           status_before_deletion: Database["public"]["Enums"]["profile_status"] | null
+          timezone: string | null
           location: unknown
           marketing_consent: boolean
           phone_e164: string | null
@@ -564,6 +566,7 @@ export type Database = {
         Row: {
           bio: string | null
           city: string | null
+          country_code: string | null
           created_at: string
           display_name: string | null
           education: string | null
@@ -676,9 +679,14 @@ export type Database = {
       profile_age: { Args: { target: string }; Returns: number }
       reorder_photos: { Args: { p_ids: string[] }; Returns: undefined }
       set_location: {
-        Args: { p_city: string; p_lat: number; p_lng: number }
-        Returns: undefined
+        Args: { p_city_id?: number; p_lat?: number; p_lng?: number; p_timezone?: string }
+        Returns: Json
       }
+      search_cities: {
+        Args: { p_limit?: number; p_query: string }
+        Returns: { admin_code: string | null; country_code: string; id: number; name: string; population: number }[]
+      }
+      set_timezone: { Args: { p_timezone: string }; Returns: undefined }
       set_profile_interests: { Args: { p_ids: number[] }; Returns: undefined }
       set_profile_prompts: { Args: { p_answers: Json }; Returns: undefined }
       staff_set_profile_status: {

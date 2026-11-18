@@ -16,7 +16,7 @@ export default function TermsPage() {
         <LegalDraftNotice />
         <Prose>
           <h2>1. Who can use Cubdles</h2>
-          <p>You must be at least 18 years old and legally able to enter this agreement. You may have only one account. You may not use Cubdles if we have previously removed you.</p>
+          <p>You must be at least 18 years old (or older, if the law where you live sets a higher age) and legally able to enter this agreement. You may have only one account. You may not use Cubdles if we have previously removed you.</p>
 
           <h2>2. Your account</h2>
           <p>Keep your login details safe and tell us if you think someone else has accessed your account. You&rsquo;re responsible for what happens on your account.</p>
@@ -31,7 +31,7 @@ export default function TermsPage() {
           <p>Paid features are optional. Prices, billing period and renewal terms are shown before you pay. Memberships renew automatically until cancelled; you can cancel any time and keep your features until the end of the period you&rsquo;ve paid for. Refunds follow our refund policy and applicable law.</p>
 
           <h2>6. Safety</h2>
-          <p>We review reports and take safety seriously, but we don&rsquo;t run criminal background checks, and we can&rsquo;t guarantee the behaviour of other members. Please follow the advice in our <Link href="/safety">Safety centre</Link>.</p>
+          <p>We review reports and take safety seriously, but <strong>we don&rsquo;t run criminal background checks</strong> on members, and we can&rsquo;t guarantee the behaviour of other members. Please follow the advice in our <Link href="/safety">Safety centre</Link>.</p>
 
           <h2>7. Ending the agreement</h2>
           <p>You can delete your account at any time from Settings. We may end or suspend your access if you break these terms, with notice where appropriate.</p>

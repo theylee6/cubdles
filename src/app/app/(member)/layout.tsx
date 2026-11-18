@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { MemberNav, MemberNavView } from "@/features/member/member-nav";
+import { TimezoneSync } from "@/features/member/timezone-sync";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 
@@ -14,6 +15,7 @@ export default function MemberLayout({ children }: LayoutProps<"/app">) {
       <main id="main" className="pb-24 md:pb-10 md:pl-60">
         <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">{children}</div>
       </main>
+      <TimezoneSync />
       <Suspense fallback={null}>
         <TouchLastActive />
       </Suspense>

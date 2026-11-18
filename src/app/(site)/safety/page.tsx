@@ -53,12 +53,18 @@ export default function SafetyPage() {
               <li>Meet somewhere public the first few times, and get there and home on your own.</li>
               <li>Tell a friend where you&rsquo;re going and who you&rsquo;re meeting.</li>
               <li>Affection is always opt-in. Ask, listen, and it&rsquo;s fine to change your mind at any moment.</li>
-              <li>If you feel unsafe, leave. In an emergency in India, call <strong>112</strong>.</li>
+              <li>If you feel unsafe, leave. In an emergency, call your local emergency number (for example 911 in the US and Canada, 999 in the UK, 112 across Europe and India, 000 in Australia).</li>
             </ul>
           </Prose>
         </div>
 
         <Prose>
+          <h2 id="background-checks">Important: no criminal background checks</h2>
+          <p>
+            <strong>Cubdles does not conduct criminal background checks or identity checks on every member.</strong> A
+            verified badge means a live selfie matched the person&rsquo;s photos — nothing more. Please take the same care
+            you would with anyone you meet for the first time.
+          </p>
           <h2>If something goes wrong</h2>
           <p>
             Report the person from their profile or your chat — it&rsquo;s confidential. For anything urgent or that

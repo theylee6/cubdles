@@ -10,7 +10,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { dbErrorKey, ERROR_STEP, friendlyDbError } from "./errors";
-import { CITIES, GENDER_GROUPS, LIFESTYLE_FIELDS, nearestCity, type LifestyleKey } from "./options";
+import { GENDER_GROUPS, LIFESTYLE_FIELDS, type LifestyleKey } from "./options";
 import {
   aboutSchema,
   affectionSchema,
@@ -132,22 +132,18 @@ export async function saveLookingFor(_prev: FormState, formData: FormData): Prom
 }
 
 export async function saveLocation(_prev: FormState, formData: FormData): Promise<FormState> {
-  const raw = Object.fromEntries(formData);
-  const input = { ...raw, lat: raw.lat || undefined, lng: raw.lng || undefined, city: raw.city || undefined };
+  const raw = Object.fromEntries(formData) as Record<string, string>;
+  const input = { ...raw, lat: raw.lat || undefined, lng: raw.lng || undefined, cityId: raw.cityId || undefined };
   return runStep("location", locationSchema, input, async (data, { supabase, userId }) => {
-    let point: { lat: number; lng: number };
-    let cityLabel: string;
-    if (data.mode === "device") {
-      point = { lat: data.lat!, lng: data.lng! };
-      cityLabel = nearestCity(point)?.name ?? "Elsewhere in India";
-    } else {
-      const city = CITIES.find((c) => c.name === data.city)!;
-      point = { lat: city.lat, lng: city.lng };
-      cityLabel = city.name;
-    }
-
+    // The database picks the city and country (from the chosen city, or nearest to the shared point)
+    // and rounds coordinates to ~1 km. The browser never decides where someone "is".
     const [loc, pref] = await Promise.all([
-      supabase.rpc("set_location", { p_lat: point.lat, p_lng: point.lng, p_city: cityLabel }),
+      supabase.rpc("set_location", {
+        p_lat: data.mode === "device" ? data.lat : undefined,
+        p_lng: data.mode === "device" ? data.lng : undefined,
+        p_city_id: data.mode === "city" ? data.cityId : undefined,
+        p_timezone: data.timezone,
+      }),
       supabase.from("preferences").update({ max_distance_km: data.distanceKm }).eq("profile_id", userId),
     ]);
     if (loc.error || pref.error) return fail(loc.error ?? pref.error);

@@ -15,7 +15,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Contact"
         title="We'd love to hear from you"
-        intro="Questions, ideas or a safety concern — a real person reads every message. If you're in danger right now in India, call 112."
+        intro="Questions, ideas or a safety concern — a real person reads every message. If you're in danger right now, call your local emergency number."
       />
       <Container className="grid gap-10 lg:grid-cols-[1fr_320px]">
         <Card className="p-6 sm:p-8">

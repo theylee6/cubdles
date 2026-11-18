@@ -60,6 +60,16 @@ Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `l
 
 `my_features()` for UI gating; `is_incognito` can only change through `set_incognito()`, which checks the entitlement.
 
+## Migration 6 — global (2026-11-18)
+
+| Object | Purpose |
+| --- | --- |
+| `cities` | World gazetteer (GeoNames, CC BY 4.0), read-only to members; prefix indexes + GiST |
+| `country_rules` | Countries where sign-up is refused (read-only to members) |
+| `profiles.country_code`, `profile_private.timezone`, `preferences.distance_unit` | Where a member is, their local midnight, km/mi |
+| `search_cities()`, `set_location(lat, lng, city_id, timezone)`, `set_timezone()` | City search; server-side city/country resolution; travel updates |
+| `private.member_timezone/member_today/period_start` | Quotas and daily picks in local time |
+
 ## Coming in later migrations
 
 Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

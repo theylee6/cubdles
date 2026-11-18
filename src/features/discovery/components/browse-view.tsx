@@ -8,7 +8,6 @@ import { Chip } from "@/components/ui/primitives";
 import { CUDDLE_STYLES, INTENTIONS, PACES } from "@/features/onboarding/options";
 import { cn } from "@/lib/utils";
 import { loadDiscoverPage } from "../actions";
-import { distanceText } from "../copy";
 import type { DiscoverFilters, ProfileCard } from "../types";
 
 /** Grid browsing with filters. Intention filtering is free; the rest needs Cubdles Plus (enforced in the DB). */
@@ -111,7 +110,7 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
                     {c.display_name}
                     {c.age ? `, ${c.age}` : ""}
                   </p>
-                  <p className="text-xs text-mocha">{distanceText(c.distance) ?? c.city}</p>
+                  <p className="text-xs text-mocha">{c.distance_label ?? c.city}</p>
                 </div>
               </Link>
             </li>

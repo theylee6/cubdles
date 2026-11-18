@@ -26,6 +26,8 @@ export type ProfileCard = {
   job_title: string | null;
   education: string | null;
   distance: DistanceBucket | null;
+  /** Added on the server in the viewer's unit (km / miles). */
+  distance_label?: string | null;
   /** Exact time is stripped on the server; only this coarse label reaches the browser. */
   last_active_at: string | null;
   last_active_label?: string | null;

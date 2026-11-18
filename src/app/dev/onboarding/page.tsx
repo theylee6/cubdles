@@ -27,7 +27,7 @@ export default function OnboardingPreview() {
       <section id="birthday"><StepShell slug="birthday"><BirthdayStep birthDate={null} termsAccepted={false} today="2026-11-18" /></StepShell></section>
       <section id="basics"><StepShell slug="basics"><BasicsStep displayName="Meera" genderGroup="woman" genderIdentity={null} pronouns="she/her" /></StepShell></section>
       <section id="looking-for"><StepShell slug="looking-for"><LookingForStep intention="long_term" showGenders={["man"]} ageMin={26} ageMax={36} /></StepShell></section>
-      <section id="location"><StepShell slug="location"><LocationStep city="Bengaluru" maxDistanceKm={25} /></StepShell></section>
+      <section id="location"><StepShell slug="location"><LocationStep city="Bengaluru" country="India" maxDistanceKm={25} unit="km" /></StepShell></section>
       <section id="affection"><StepShell slug="affection"><AffectionStep cuddleStyle="little_spoon" pace="slow" touchComfort={4} publicAffection={3} loveLanguages={["touch"]} /></StepShell></section>
       <section id="interests"><StepShell slug="interests"><InterestsStep catalogue={interests} selected={[1, 2, 4]} lifestyle={{}} /></StepShell></section>
       <section id="photos"><StepShell slug="photos"><PhotosStep photos={[]} /></StepShell></section>

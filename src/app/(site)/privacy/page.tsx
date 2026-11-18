@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           <ul>
             <li><strong>Account details:</strong> email, password (stored only as a secure hash by our authentication provider), and phone number if you verify it.</li>
             <li><strong>Profile:</strong> name, photos, date of birth, gender, what you&rsquo;re looking for, interests, lifestyle, prompts and your affection profile. Sensitive details like religion are optional.</li>
-            <li><strong>Approximate location:</strong> rounded to about 1 km before we store it, used only to suggest people nearby.</li>
+            <li><strong>Approximate location and time zone:</strong> location is rounded to about 1 km before we store it and used only to suggest people nearby; your time zone sets when daily limits reset.</li>
             <li><strong>Activity:</strong> likes, passes, matches, messages, reports and blocks — needed to run the service and keep it safe.</li>
             <li><strong>Payments:</strong> handled by our payment provider. We never see or store your full card details.</li>
             <li><strong>Product analytics:</strong> only with your consent, using pseudonymous identifiers.</li>
@@ -34,6 +34,9 @@ export default function PrivacyPage() {
           <h2>Who we share it with</h2>
           <p>Service providers that help us run Cubdles (hosting, database, email, SMS, payments, photo safety checks, identity verification), each under a contract that limits how they use your data. We may share information with authorities where the law requires it or to protect someone&rsquo;s safety. We don&rsquo;t sell your personal data.</p>
 
+          <h2>International transfers</h2>
+          <p>Cubdles is used worldwide and our servers are in Japan. When your data moves between countries, we use legal safeguards such as standard contractual clauses.</p>
+
           <h2>How long we keep it</h2>
           <p>While your account is open. When you delete your account, your profile is hidden at once and permanently deleted after 30 days. Some records are kept longer where the law requires (such as payment records) or for safety (such as the reason an account was banned).</p>
 
@@ -42,7 +45,7 @@ export default function PrivacyPage() {
             <li>Edit or hide parts of your profile, turn off online status and read receipts, and pause your account.</li>
             <li>Download a copy of your data, correct it, or delete your account from Settings.</li>
             <li>Withdraw consent for optional processing (like analytics or marketing emails) at any time.</li>
-            <li>Raise a complaint with us, and if you&rsquo;re not satisfied, with the relevant data protection authority.</li>
+            <li>Raise a complaint with us, and if you&rsquo;re not satisfied, with your local data protection authority (for example in the EU, the UK, India, or your US state).</li>
           </ul>
           <p>Questions? <Link href="/contact">Contact us</Link> and choose &ldquo;Privacy&rdquo;.</p>
         </Prose>

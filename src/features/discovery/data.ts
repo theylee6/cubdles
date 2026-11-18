@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { lastActiveText } from "./copy";
+import { getSessionUser } from "@/lib/auth/session";
+import { distanceText, lastActiveText } from "./copy";
 import type { DiscoverFilters, ProfileCard } from "./types";
 
 const PHOTO_TTL = 60 * 60;
@@ -16,6 +17,14 @@ async function withPhotoUrls(supabase: Client, cards: ProfileCard[]): Promise<Pr
   return cards.map((c) => ({ ...c, photos: c.photos.map((p) => ({ ...p, url: urls.get(p.path) ?? null })) }));
 }
 
+/** The viewer's preferred distance unit (set from their country, km by default). */
+async function viewerUnit(sb: Client): Promise<"km" | "mi"> {
+  const user = await getSessionUser();
+  if (!user) return "km";
+  const { data } = await sb.from("preferences").select("distance_unit").eq("profile_id", user.id).single();
+  return data?.distance_unit === "mi" ? "mi" : "km";
+}
+
 /** Full cards for the given ids, in order. Ids the viewer may not see are silently dropped. */
 export async function getCards(ids: string[], supabase?: Client): Promise<ProfileCard[]> {
   if (!ids.length) return [];
@@ -23,8 +32,10 @@ export async function getCards(ids: string[], supabase?: Client): Promise<Profil
   const { data, error } = await sb.rpc("profile_cards", { p_ids: ids.slice(0, 50) });
   if (error) throw new Error(`profile_cards failed: ${error.message}`);
   const now = Date.now();
+  const unit = await viewerUnit(sb);
   const cards = ((data ?? []) as unknown as ProfileCard[]).map((c) => ({
     ...c,
+    distance_label: distanceText(c.distance, unit),
     last_active_label: lastActiveText(c.last_active_at, now),
     last_active_at: null, // never send exact activity times to the browser
   }));

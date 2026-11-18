@@ -54,44 +54,18 @@ export const LIFESTYLE_FIELDS = {
   exercise: { label: "Exercise", options: [["rarely", "Rarely"], ["sometimes", "Sometimes"], ["often", "Often"]] },
   kids: { label: "Children", options: [["have", "Have children"], ["want", "Want children"], ["dont_want", "Don't want children"], ["open", "Open to it"], ["prefer_not", "Prefer not to say"]] },
   pets: { label: "Pets", options: [["dog", "Dog person"], ["cat", "Cat person"], ["both", "Both"], ["other", "Other pets"], ["none", "No pets"], ["want", "Want one"]] },
-  diet: { label: "Diet", options: [["vegetarian", "Vegetarian"], ["vegan", "Vegan"], ["eggetarian", "Eggetarian"], ["non_vegetarian", "Non-vegetarian"], ["jain", "Jain"], ["other", "Other"]] },
+  diet: { label: "Diet", options: [["vegetarian", "Vegetarian"], ["vegan", "Vegan"], ["eggetarian", "Eggetarian"], ["non_vegetarian", "Eats meat"], ["jain", "Jain"], ["other", "Other"]] },
 } as const;
 export type LifestyleKey = keyof typeof LIFESTYLE_FIELDS;
 
 export const DISTANCES_KM = [5, 10, 25, 50, 100, 200] as const;
 
-/**
- * Launch cities with approximate centre coordinates. Used when a member picks a city
- * instead of sharing their location, and to name the nearest city for shared locations.
- */
-export const CITIES = [
-  { name: "Ahmedabad", lat: 23.02, lng: 72.57 },
-  { name: "Bengaluru", lat: 12.97, lng: 77.59 },
-  { name: "Bhopal", lat: 23.26, lng: 77.41 },
-  { name: "Bhubaneswar", lat: 20.3, lng: 85.82 },
-  { name: "Chandigarh", lat: 30.73, lng: 76.78 },
-  { name: "Chennai", lat: 13.08, lng: 80.27 },
-  { name: "Coimbatore", lat: 11.02, lng: 76.96 },
-  { name: "Delhi", lat: 28.61, lng: 77.21 },
-  { name: "Goa", lat: 15.5, lng: 73.83 },
-  { name: "Gurugram", lat: 28.46, lng: 77.03 },
-  { name: "Guwahati", lat: 26.14, lng: 91.74 },
-  { name: "Hyderabad", lat: 17.39, lng: 78.49 },
-  { name: "Indore", lat: 22.72, lng: 75.86 },
-  { name: "Jaipur", lat: 26.91, lng: 75.79 },
-  { name: "Kochi", lat: 9.93, lng: 76.27 },
-  { name: "Kolkata", lat: 22.57, lng: 88.36 },
-  { name: "Lucknow", lat: 26.85, lng: 80.95 },
-  { name: "Mumbai", lat: 19.08, lng: 72.88 },
-  { name: "Mysuru", lat: 12.3, lng: 76.64 },
-  { name: "Nagpur", lat: 21.15, lng: 79.09 },
-  { name: "Noida", lat: 28.54, lng: 77.39 },
-  { name: "Pune", lat: 18.52, lng: 73.86 },
-  { name: "Surat", lat: 21.17, lng: 72.83 },
-  { name: "Thiruvananthapuram", lat: 8.52, lng: 76.94 },
-  { name: "Vadodara", lat: 22.31, lng: 73.18 },
-  { name: "Visakhapatnam", lat: 17.69, lng: 83.22 },
-] as const;
+export type DistanceUnit = "km" | "mi";
+
+/** Search radius options, stored in km. Shown in the member's unit. */
+export function distanceOptionLabel(km: number, unit: DistanceUnit): string {
+  return unit === "mi" ? `${Math.round(km * 0.621371)} mi` : `${km} km`;
+}
 
 /** Great-circle distance in km. */
 export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
@@ -103,18 +77,14 @@ export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; ln
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-/** Nearest launch city to a point, or null when none is within maxKm. */
-export function nearestCity(point: { lat: number; lng: number }, maxKm = 75) {
-  let best: (typeof CITIES)[number] | null = null;
-  let bestKm = Infinity;
-  for (const c of CITIES) {
-    const d = distanceKm(point, c);
-    if (d < bestKm) {
-      best = c;
-      bestKm = d;
-    }
+/** English country name for an ISO code, e.g. "GB" → "United Kingdom". */
+export function countryName(code: string | null | undefined): string | null {
+  if (!code) return null;
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" }).of(code) ?? code;
+  } catch {
+    return code;
   }
-  return best && bestKm <= maxKm ? best : null;
 }
 
 export function labelFor<T extends readonly Option[]>(options: T, value: string | null | undefined): string | null {

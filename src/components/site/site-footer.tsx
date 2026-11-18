@@ -37,6 +37,9 @@ export function SiteFooter() {
           <p className="max-w-xs text-sm leading-relaxed text-mocha">
             Cubdles (said &ldquo;cuddles&rdquo;) is dating for people who love closeness. For adults 18 and over.
           </p>
+          <p className="text-xs text-mocha">
+            City data &copy; <a href="https://www.geonames.org/" className="underline underline-offset-2">GeoNames</a>, CC BY 4.0.
+          </p>
         </div>
         {GROUPS.map((group) => (
           <nav key={group.title} aria-label={group.title} className="flex flex-col gap-3">

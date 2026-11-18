@@ -111,7 +111,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 select tests.ok(public.submit_birth_date('1998-06-15') = true, 'adult birth date accepted');
 select tests.throws('select public.complete_onboarding()', 'onboarding cannot finish without name, location, consent and photos');
 select public.accept_terms(false);
-select public.set_location(12.971598, 77.594566, 'Bengaluru');
+select public.set_location(12.971598, 77.594566);
 select tests.ok((select extensions.st_y(location::extensions.geometry) from public.profile_private) = 12.97, 'location is rounded to about 1 km before storage');
 update public.profiles set display_name = 'Chitra', gender_identity = 'woman', gender_group = 'woman', intention = 'figuring_out';
 update public.preferences set show_genders = '{man}';

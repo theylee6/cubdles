@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Your account", robots: { index: false } };
 
-const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "long", year: "numeric" });
+const dateFmt = new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric" });
 
 export default function RestorePage() {
   return (

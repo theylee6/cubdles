@@ -18,8 +18,9 @@ describe("compatibility reasons", () => {
 });
 
 describe("privacy-preserving labels", () => {
-  it("shows distance only as buckets", () => {
+  it("shows distance only as buckets, in km or miles", () => {
     expect(distanceText("under_5")).toBe("Under 5 km away");
+    expect(distanceText("under_5", "mi")).toBe("Under 3 miles away");
     expect(distanceText(null)).toBeNull();
   });
   it("shows activity only as today / this week", () => {

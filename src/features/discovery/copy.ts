@@ -21,16 +21,26 @@ export function reasonText(r: Reason): string | null {
   }
 }
 
-const DISTANCE: Record<DistanceBucket, string> = {
-  under_5: "Under 5 km away",
-  "5_10": "5–10 km away",
-  "10_25": "10–25 km away",
-  "25_50": "25–50 km away",
-  "50_plus": "More than 50 km away",
+const DISTANCE: Record<"km" | "mi", Record<DistanceBucket, string>> = {
+  km: {
+    under_5: "Under 5 km away",
+    "5_10": "5–10 km away",
+    "10_25": "10–25 km away",
+    "25_50": "25–50 km away",
+    "50_plus": "More than 50 km away",
+  },
+  // Same km buckets, expressed in rounded miles.
+  mi: {
+    under_5: "Under 3 miles away",
+    "5_10": "3–6 miles away",
+    "10_25": "6–15 miles away",
+    "25_50": "15–30 miles away",
+    "50_plus": "More than 30 miles away",
+  },
 };
 
-export function distanceText(bucket: DistanceBucket | null): string | null {
-  return bucket ? DISTANCE[bucket] : null;
+export function distanceText(bucket: DistanceBucket | null, unit: "km" | "mi" = "km"): string | null {
+  return bucket ? DISTANCE[unit][bucket] : null;
 }
 
 export function cuddleStyleText(v: string | null | undefined) {

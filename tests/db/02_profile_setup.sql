@@ -73,14 +73,14 @@ set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000201","role":"authenticated"}', false);
 select public.submit_birth_date('1994-02-11');
 select public.accept_terms(false);
-select public.set_location(19.076, 72.8777, 'Mumbai');
+select public.set_location(19.076, 72.8777);
 update public.profiles set display_name = 'Dev', intention = 'long_term' where id = auth.uid();
 select tests.lives('select public.complete_onboarding()', 'onboarding completes with all sections filled');
 
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000202","role":"authenticated"}', false);
 select public.submit_birth_date('1996-09-30');
 select public.accept_terms(false);
-select public.set_location(28.61, 77.21, 'Delhi');
+select public.set_location(28.61, 77.21);
 update public.profiles set display_name = 'Esha', gender_identity = 'Woman', gender_group = 'woman', intention = 'long_term' where id = auth.uid();
 update public.preferences set show_genders = '{man}';
 insert into public.photos (profile_id, storage_path, position) values (auth.uid(), auth.uid() || '/1.webp', 0), (auth.uid(), auth.uid() || '/2.webp', 1);

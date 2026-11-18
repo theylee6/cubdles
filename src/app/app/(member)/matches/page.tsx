@@ -6,7 +6,7 @@ import { requireActiveMember } from "@/lib/auth/member";
 
 export const metadata = { title: "Matches" };
 
-const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short" });
+const dateFmt = new Intl.DateTimeFormat("en", { day: "numeric", month: "short" });
 
 export default function MatchesPage() {
   return (

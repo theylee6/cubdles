@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Suspense } from "react";
 import { Check, Minus } from "lucide-react";
 import { PageHero } from "@/components/site/page-parts";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, Container, Notice } from "@/components/ui/primitives";
 import { FEATURE_LABELS, describeEntitlement, getActivePlans, perMonthMinor, savingsPercent, type Plan } from "@/lib/plans";
+import { currencyForCountry, localeForCurrency, pickPrices } from "@/lib/currency";
 import { formatMoney } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -45,7 +47,7 @@ export default function PricingPage() {
         </Suspense>
 
         <p className="text-sm text-mocha">
-          Prices include applicable taxes unless shown otherwise. Memberships renew automatically and you can cancel any
+          Prices are shown in your local currency where available and include applicable taxes unless stated otherwise. Memberships renew automatically and you can cancel any
           time from Settings — you keep your features until the end of the period you&rsquo;ve paid for. We never store
           your card details.
         </p>
@@ -56,8 +58,13 @@ export default function PricingPage() {
 
 /** Prices come from the database; streamed so a slow or failed lookup never blocks the page. */
 async function Plans() {
+  // Vercel sets the visitor's country; prices show in that currency when we have them.
+  const currency = currencyForCountry((await headers()).get("x-vercel-ip-country"));
   const result = await getActivePlans();
-  if (result.status === "ok" && result.plans.length > 0) return <PlanGrid plans={result.plans} />;
+  if (result.status === "ok" && result.plans.length > 0) {
+    const plans = result.plans.map((p) => ({ ...p, prices: pickPrices(p.prices, currency) }));
+    return <PlanGrid plans={plans} />;
+  }
   return (
     <Notice title="Membership prices aren't published yet">
       {result.status === "error"
@@ -95,9 +102,9 @@ function PlanGrid({ plans }: { plans: Plan[] }) {
                         {save ? <span className="ml-2 rounded-full bg-blush-soft px-2 py-0.5 text-xs font-medium text-clay-deep">Save {save}%</span> : null}
                       </span>
                       <span className="text-right">
-                        <span className="font-display text-xl text-cocoa">{formatMoney(price.amountMinor, price.currency)}</span>
+                        <span className="font-display text-xl text-cocoa">{formatMoney(price.amountMinor, price.currency, localeForCurrency(price.currency))}</span>
                         {price.periodMonths > 1 ? (
-                          <span className="block text-xs text-mocha">{formatMoney(perMonthMinor(price), price.currency)} / month</span>
+                          <span className="block text-xs text-mocha">{formatMoney(perMonthMinor(price), price.currency, localeForCurrency(price.currency))} / month</span>
                         ) : null}
                       </span>
                     </li>

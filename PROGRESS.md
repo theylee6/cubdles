@@ -1,10 +1,12 @@
 # Cubdles — development progress
 
-Last updated: 2026-11-18 (M3 discovery & matching, profile editing, settings).
+Last updated: 2026-11-18 (global launch support).
+
+**Decision (18 Nov): Cubdles launches worldwide.** See plan section 2b for regional requirements and decisions G1–G5.
 
 ## Supabase project
 
-- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–5 applied; interests and prompts loaded; no placeholder prices.
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–6 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
 - Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
 - Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
 - Still to configure in the dashboard: Auth URLs, email templates, Google/Apple providers, SMTP (see README). Defaults D2–D10 from the Phase 1 plan are assumed (India launch, romantic only, mutual-match messaging) until the owner says otherwise.
@@ -51,11 +53,21 @@ Last updated: 2026-11-18 (M3 discovery & matching, profile editing, settings).
 - Account deletion: `request_account_deletion()` hides the profile and ends matches; `restore_account()` within 30 days returns to the exact previous status (a suspension can't be lifted this way); `/api/cron/purge-accounts` (Vercel Cron, daily 03:00 IST, needs `CRON_SECRET`) removes photos and deletes the auth user.
 - Dev-only previews: `/dev/onboarding`, `/dev/discovery`.
 
+## Global support (migration 6)
+
+- `cities` (GeoNames CC BY 4.0, attribution in the footer) with `search_cities()`; `set_location()` takes a city id or device coordinates and the server resolves city + country (nearest city, PostGIS KNN). Coordinates are rounded to ~1 km.
+- Members' IANA time zone (captured from the browser at the location step and on each session via `set_timezone()`); quotas and daily picks reset at local midnight.
+- `preferences.distance_unit` (mi for US/GB/LR/MM, else km); distance labels are computed server-side in the viewer's unit.
+- `country_rules`: CU, IR, KP, SY blocked at the location step (confirm list with counsel).
+- Pricing shows the visitor's currency (Vercel `x-vercel-ip-country`) when `plan_prices` has it, else USD.
+- Safety centre states that Cubdles does not run criminal background checks (US state disclosure laws).
+- New environments: load cities with `supabase/functions/load-cities` (see header comment).
+
 ## Pending (next up)
 
 1. M4: real-time messaging (conversations created on match), notifications, reporting.
 2. Photo moderation: automated scan provider + moderator queue (M5). Until then photos stay `pending` and need approving in the database.
-3. Phone OTP (needs SMS provider + DLT registration).
+3. Phone OTP (global SMS provider, e.g. Twilio Verify).
 4. Rate limiting (Upstash) on sign-up, login, contact form and uploads.
 5. Regenerate `src/lib/supabase/database.types.ts` after every migration.
 
@@ -71,3 +83,6 @@ Last updated: 2026-11-18 (M3 discovery & matching, profile editing, settings).
 - Discovery scores every eligible candidate per request. Fine for launch-city scale; at larger scale, precompute scores (materialised candidate table refreshed by a job).
 - Swipe deck re-queries from offset 0 when it runs low (offsets shift as people are liked/passed); browse uses offsets and may show a person twice after acting on them.
 - Reporting a profile isn't built yet (M5); blocking is available everywhere.
+- UK: highly effective age assurance for UK members is needed before UK launch (decision G2, verification provider in M7).
+- EU/UK representatives (GDPR Art. 27, DSA) and legal review are owner actions (G4, G5).
+- English only; strings are not yet extracted for translation (G1).

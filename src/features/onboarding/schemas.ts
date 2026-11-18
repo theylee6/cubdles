@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  CITIES,
   CUDDLE_STYLES,
   DISTANCES_KM,
   GENDER_GROUPS,
@@ -72,21 +71,20 @@ export const lookingForSchema = z
   })
   .refine((v) => v.ageMin <= v.ageMax, { message: "The first age should be the smaller one.", path: ["ageMax"] });
 
-const cityNames = CITIES.map((c) => c.name) as [string, ...string[]];
-
 export const locationSchema = z
   .object({
     mode: z.enum(["device", "city"]),
     lat: z.coerce.number().min(-90).max(90).optional(),
     lng: z.coerce.number().min(-180).max(180).optional(),
-    city: z.enum(cityNames, { error: "Choose your city." }).optional(),
+    cityId: z.coerce.number().int().positive().optional(),
+    timezone: z.string().max(64).regex(/^[A-Za-z_]+(\/[A-Za-z0-9_+-]+)*$/).optional().or(z.literal("").transform(() => undefined)),
     distanceKm: z.coerce
       .number()
       .refine((v) => (DISTANCES_KM as readonly number[]).includes(v), "Choose a distance."),
   })
-  .refine((v) => (v.mode === "device" ? v.lat !== undefined && v.lng !== undefined : v.city !== undefined), {
-    message: "Share your location or choose a city.",
-    path: ["city"],
+  .refine((v) => (v.mode === "device" ? v.lat !== undefined && v.lng !== undefined : v.cityId !== undefined), {
+    message: "Share your location or choose your city.",
+    path: ["cityId"],
   });
 
 export const affectionSchema = z.object({

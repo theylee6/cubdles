@@ -81,3 +81,16 @@ select id, e.k, e.v, e.p from plus,
           ('advanced_filters', null, null), ('undo', null, null), ('incognito', null, null), ('boosts', 1, 'month'))
     as e(k, v, p)
 on conflict do nothing;
+
+-- A handful of cities for local development and tests. Production loads ~24k via scripts/load-cities.mjs.
+insert into public.cities (id, name, ascii_name, country_code, admin_code, population, location) values
+  (1277333, 'Bengaluru', 'Bengaluru', 'IN', '19', 5104047, extensions.st_setsrid(extensions.st_makepoint(77.59369, 12.97194), 4326)::extensions.geography),
+  (1275339, 'Mumbai', 'Mumbai', 'IN', '16', 12691836, extensions.st_setsrid(extensions.st_makepoint(72.88261, 19.07283), 4326)::extensions.geography),
+  (1273294, 'Delhi', 'Delhi', 'IN', '07', 10927986, extensions.st_setsrid(extensions.st_makepoint(77.23149, 28.65195), 4326)::extensions.geography),
+  (2643743, 'London', 'London', 'GB', 'ENG', 8961989, extensions.st_setsrid(extensions.st_makepoint(-0.12574, 51.50853), 4326)::extensions.geography),
+  (5128581, 'New York City', 'New York City', 'US', 'NY', 8804190, extensions.st_setsrid(extensions.st_makepoint(-74.00597, 40.71427), 4326)::extensions.geography),
+  (2147714, 'Sydney', 'Sydney', 'AU', '02', 4627345, extensions.st_setsrid(extensions.st_makepoint(151.20732, -33.86785), 4326)::extensions.geography),
+  (2950159, 'Berlin', 'Berlin', 'DE', '16', 3426354, extensions.st_setsrid(extensions.st_makepoint(13.41053, 52.52437), 4326)::extensions.geography),
+  (3553478, 'Havana', 'Havana', 'CU', '03', 2163824, extensions.st_setsrid(extensions.st_makepoint(-82.38304, 23.13302), 4326)::extensions.geography),
+  (3117735, 'Madrid', 'Madrid', 'ES', '29', 3255944, extensions.st_setsrid(extensions.st_makepoint(-3.70256, 40.4165), 4326)::extensions.geography)
+on conflict (id) do nothing;

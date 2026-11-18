@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { GENDER_GROUPS, LOVE_LANGUAGES, type CuddleStyle, type GenderGroup, type Intention, type LoveLanguage, type Pace } from "./options";
+import { GENDER_GROUPS, LOVE_LANGUAGES, type CuddleStyle, type DistanceUnit, type GenderGroup, type Intention, type LoveLanguage, type Pace } from "./options";
 
 /** Text columns with CHECK constraints come back as `string`; narrow them to the known values. */
 function oneOf<T extends string>(allowed: readonly { value: T }[], v: string | null | undefined): T | null {
@@ -35,9 +35,10 @@ export type OnboardingData = {
     jobTitle: string | null;
     education: string | null;
     city: string | null;
+    countryCode: string | null;
   };
   privateInfo: { birthDate: string | null; hasLocation: boolean; termsAccepted: boolean };
-  preferences: { ageMin: number; ageMax: number; maxDistanceKm: number; showGenders: GenderGroup[] };
+  preferences: { ageMin: number; ageMax: number; maxDistanceKm: number; showGenders: GenderGroup[]; distanceUnit: DistanceUnit };
   affection: {
     cuddleStyle: CuddleStyle | null;
     pace: Pace | null;
@@ -56,11 +57,11 @@ export async function loadOnboardingData(userId: string): Promise<OnboardingData
   const [profile, priv, prefs, aff, life, interests, prompts] = await Promise.all([
     supabase
       .from("profiles")
-      .select("status, status_reason, onboarding_step, display_name, gender_group, gender_identity, pronouns, intention, bio, job_title, education, city")
+      .select("status, status_reason, onboarding_step, display_name, gender_group, gender_identity, pronouns, intention, bio, job_title, education, city, country_code")
       .eq("id", userId)
       .single(),
     supabase.from("profile_private").select("birth_date, location, terms_accepted_at").eq("profile_id", userId).single(),
-    supabase.from("preferences").select("age_min, age_max, max_distance_km, show_genders").eq("profile_id", userId).single(),
+    supabase.from("preferences").select("age_min, age_max, max_distance_km, show_genders, distance_unit").eq("profile_id", userId).single(),
     supabase.from("affection_profiles").select("cuddle_style, pace, touch_comfort, public_affection, love_languages").eq("profile_id", userId).single(),
     supabase.from("lifestyle").select("drinking, smoking, exercise, kids, pets, diet").eq("profile_id", userId).single(),
     supabase.from("profile_interests").select("interest_id").eq("profile_id", userId),
@@ -84,6 +85,7 @@ export async function loadOnboardingData(userId: string): Promise<OnboardingData
       jobTitle: p.job_title,
       education: p.education,
       city: p.city,
+      countryCode: p.country_code,
     },
     privateInfo: {
       birthDate: priv.data?.birth_date ?? null,
@@ -95,6 +97,7 @@ export async function loadOnboardingData(userId: string): Promise<OnboardingData
       ageMax: prefs.data?.age_max ?? 40,
       maxDistanceKm: prefs.data?.max_distance_km ?? 25,
       showGenders: manyOf(GENDER_GROUPS, prefs.data?.show_genders),
+      distanceUnit: prefs.data?.distance_unit === "mi" ? "mi" : "km",
     },
     affection: {
       cuddleStyle: aff.data?.cuddle_style ?? null,

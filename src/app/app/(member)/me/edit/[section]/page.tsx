@@ -7,6 +7,7 @@ import { AboutStep, AffectionStep, BasicsStep, InterestsStep, LookingForStep } f
 import { LocationStep } from "@/features/onboarding/components/location-step";
 import { PromptsStep } from "@/features/onboarding/components/prompts-step";
 import { StepModeProvider } from "@/features/onboarding/components/step-mode";
+import { countryName } from "@/features/onboarding/options";
 import { STEPS } from "@/features/onboarding/steps";
 import { PageSkeleton } from "@/features/member/page-header";
 import { PhotoManager } from "@/features/photos/photo-manager";
@@ -43,7 +44,7 @@ async function Edit({ section }: { section: EditSection }) {
       body = <LookingForStep intention={d.profile.intention} showGenders={d.preferences.showGenders} ageMin={d.preferences.ageMin} ageMax={d.preferences.ageMax} />;
       break;
     case "location":
-      body = <LocationStep city={d.profile.city} maxDistanceKm={d.preferences.maxDistanceKm} />;
+      body = <LocationStep city={d.profile.city} country={countryName(d.profile.countryCode)} maxDistanceKm={d.preferences.maxDistanceKm} unit={d.preferences.distanceUnit} />;
       break;
     case "affection":
       body = <AffectionStep {...d.affection} />;

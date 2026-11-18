@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { distanceText } from "../copy";
 import type { ProfileCard } from "../types";
 
 /** Simple list of people (likes, matches). Server-renderable. */
@@ -24,7 +23,7 @@ export function PersonList({ cards, emptyText, meta }: { cards: ProfileCard[]; e
                 {c.display_name}
                 {c.age ? `, ${c.age}` : ""}
               </p>
-              <p className="truncate text-sm text-mocha">{meta ? meta(c) : (distanceText(c.distance) ?? c.city)}</p>
+              <p className="truncate text-sm text-mocha">{meta ? meta(c) : (c.distance_label ?? c.city)}</p>
             </div>
           </Link>
         </li>

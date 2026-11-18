@@ -13,10 +13,13 @@ export function safeNextPath(next: unknown, fallback = "/app"): string {
 }
 
 /** Format a minor-unit amount (paise, cents) for display. */
-export function formatMoney(amountMinor: number, currency: string, locale = "en-IN"): string {
+export function formatMoney(amountMinor: number, currency: string, locale = "en-US"): string {
+  // Zero-decimal currencies (JPY, KRW…) store whole units in amount_minor.
+  const digits = new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
+  const value = amountMinor / 10 ** digits;
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    maximumFractionDigits: amountMinor % 100 === 0 ? 0 : 2,
-  }).format(amountMinor / 100);
+    maximumFractionDigits: Number.isInteger(value) ? 0 : digits,
+  }).format(value);
 }

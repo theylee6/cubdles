@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { describeEntitlement, perMonthMinor, savingsPercent, toPlan } from "@/lib/plans";
+import { currencyForCountry, pickPrices } from "@/lib/currency";
 import { formatMoney, safeNextPath } from "@/lib/utils";
 
 describe("safeNextPath (open-redirect protection)", () => {
@@ -17,11 +18,27 @@ describe("safeNextPath (open-redirect protection)", () => {
 });
 
 describe("formatMoney", () => {
-  it("formats whole rupees without decimals", () => {
-    expect(formatMoney(49900, "INR")).toBe("₹499");
+  it("formats whole amounts without decimals", () => {
+    expect(formatMoney(49900, "INR", "en-IN")).toBe("₹499");
+    expect(formatMoney(999, "USD")).toBe("$9.99");
   });
-  it("keeps decimals when needed", () => {
-    expect(formatMoney(49950, "INR")).toBe("₹499.50");
+  it("handles zero-decimal currencies", () => {
+    expect(formatMoney(1200, "JPY", "ja-JP")).toBe("￥1,200");
+  });
+});
+
+describe("currency selection", () => {
+  it("maps visitor country to currency, defaulting to USD", () => {
+    expect(currencyForCountry("GB")).toBe("GBP");
+    expect(currencyForCountry("de")).toBe("EUR");
+    expect(currencyForCountry("ZZ")).toBe("USD");
+    expect(currencyForCountry(null)).toBe("USD");
+  });
+  it("prefers local prices, then USD, then whatever exists", () => {
+    const prices = [{ currency: "USD" }, { currency: "INR" }];
+    expect(pickPrices(prices, "INR")).toEqual([{ currency: "INR" }]);
+    expect(pickPrices(prices, "GBP")).toEqual([{ currency: "USD" }]);
+    expect(pickPrices([{ currency: "INR" }], "GBP")).toEqual([{ currency: "INR" }]);
   });
 });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nearestCity, distanceKm } from "@/features/onboarding/options";
+import { countryName, distanceKm, distanceOptionLabel } from "@/features/onboarding/options";
 import {
   affectionSchema,
   ageOn,
@@ -81,17 +81,25 @@ describe("looking for", () => {
 });
 
 describe("location", () => {
-  it("accepts either device coordinates or a known city", () => {
-    expect(locationSchema.safeParse({ mode: "device", lat: "12.97", lng: "77.59", distanceKm: "25" }).success).toBe(true);
-    expect(locationSchema.safeParse({ mode: "city", city: "Pune", distanceKm: "10" }).success).toBe(true);
+  it("accepts either device coordinates or a chosen city id", () => {
+    expect(locationSchema.safeParse({ mode: "device", lat: "51.51", lng: "-0.13", distanceKm: "25", timezone: "Europe/London" }).success).toBe(true);
+    expect(locationSchema.safeParse({ mode: "city", cityId: "2643743", distanceKm: "10" }).success).toBe(true);
     expect(locationSchema.safeParse({ mode: "city", distanceKm: "10" }).success).toBe(false);
-    expect(locationSchema.safeParse({ mode: "city", city: "Atlantis", distanceKm: "10" }).success).toBe(false);
-    expect(locationSchema.safeParse({ mode: "city", city: "Pune", distanceKm: "7" }).success).toBe(false);
+    expect(locationSchema.safeParse({ mode: "city", cityId: "-4", distanceKm: "10" }).success).toBe(false);
+    expect(locationSchema.safeParse({ mode: "city", cityId: "2643743", distanceKm: "7" }).success).toBe(false);
   });
-  it("names the nearest launch city, or none when far away", () => {
-    expect(nearestCity({ lat: 12.93, lng: 77.62 })?.name).toBe("Bengaluru");
-    expect(nearestCity({ lat: 51.5, lng: -0.12 })).toBeNull();
-    expect(Math.round(distanceKm({ lat: 19.08, lng: 72.88 }, { lat: 18.52, lng: 73.86 }))).toBeGreaterThan(110);
+  it("rejects malformed time zone strings", () => {
+    expect(locationSchema.safeParse({ mode: "city", cityId: "1", distanceKm: "10", timezone: "'; drop table" }).success).toBe(false);
+    expect(locationSchema.safeParse({ mode: "city", cityId: "1", distanceKm: "10", timezone: "America/Argentina/Buenos_Aires" }).success).toBe(true);
+  });
+  it("shows search radius in the member's unit", () => {
+    expect(distanceOptionLabel(25, "km")).toBe("25 km");
+    expect(distanceOptionLabel(25, "mi")).toBe("16 mi");
+  });
+  it("names countries from ISO codes", () => {
+    expect(countryName("GB")).toBe("United Kingdom");
+    expect(countryName(null)).toBeNull();
+    expect(Math.round(distanceKm({ lat: 51.5, lng: -0.12 }, { lat: 48.86, lng: 2.35 }))).toBeGreaterThan(330);
   });
 });
 

@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Cubdles",
-    locale: "en_IN",
+    locale: "en_US",
   },
   robots: { index: true, follow: true },
 };
@@ -46,7 +46,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${fraunces.variable} ${figtree.variable} h-full antialiased`}>
+    <html lang="en" className={`${fraunces.variable} ${figtree.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-cream text-cocoa">{children}</body>
     </html>
   );

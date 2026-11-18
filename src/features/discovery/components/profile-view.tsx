@@ -6,7 +6,6 @@ import { AffectionBadge, Chip } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
 import {
   cuddleStyleText,
-  distanceText,
   intentionText,
   lifestyleText,
   loveLanguageText,
@@ -28,7 +27,7 @@ export function ProfileView({ card, compact = false, className }: { card: Profil
     a?.touch_comfort ? `Cuddle love ${a.touch_comfort}/5` : null,
     ...(a?.love_languages ?? []).map(loveLanguageText),
   ].filter((x): x is string => Boolean(x));
-  const meta = [distanceText(card.distance), card.city, card.last_active_label].filter(Boolean);
+  const meta = [card.distance_label, card.city, card.last_active_label].filter(Boolean);
 
   return (
     <article className={cn("overflow-hidden rounded-[var(--radius-sheet)] bg-cream ring-1 ring-oat shadow-[var(--shadow-card)]", className)}>

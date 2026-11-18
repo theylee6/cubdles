@@ -64,7 +64,7 @@ export function BirthdayStep({ birthDate, termsAccepted, today }: { birthDate: s
       {birthDate ? (
         <div className="rounded-2xl bg-linen px-5 py-4 ring-1 ring-oat">
           <p className="text-sm text-mocha">Date of birth</p>
-          <p className="text-lg">{new Date(`${birthDate}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</p>
+          <p className="text-lg">{new Date(`${birthDate}T00:00:00Z`).toLocaleDateString("en", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</p>
           <p className="mt-1 text-sm text-mocha">This can&rsquo;t be changed here. Contact us if it&rsquo;s wrong.</p>
           <input type="hidden" name="birthDate" value={birthDate} />
         </div>

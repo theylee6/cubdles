@@ -17,10 +17,11 @@ const FAQS: { q: string; a: ReactNode }[] = [
   { q: "Can anyone message me?", a: "No. Messaging opens only when you've both liked each other. You can unmatch or block at any time." },
   { q: "How do you decide who I see?", a: <>A transparent score built from your intentions, affection profile, shared interests, lifestyle and each other&rsquo;s preferences. No &ldquo;AI matchmaking&rdquo; claims — see <Link className="text-clay underline underline-offset-4" href="/how-it-works">how it works</Link>.</> },
   { q: "What does the verified badge mean?", a: "That a live selfie check matched the person to their photos. We only show it when the check has actually passed." },
-  { q: "Will people see where I live?", a: "Never. Others see only a rough distance like “under 5 km”, and we strip location data from your photos." },
+  { q: "Will people see where I live?", a: "Never. Others see only your city and a rough distance like “under 5 km”, and we strip location data from your photos." },
+  { q: "Where is Cubdles available?", a: "Worldwide, apart from a few countries where we can't legally operate. You'll see people near the city you choose, with distances in miles or kilometres depending on where you are." },
   { q: "Is Cubdles free?", a: <>Yes — creating a profile, discovering people, matching and messaging are free. A paid membership adds extras like seeing who liked you. See <Link className="text-clay underline underline-offset-4" href="/pricing">membership</Link>.</> },
   { q: "How do I delete my account?", a: "From Settings → Account → Delete. Your profile disappears straight away and is permanently deleted after 30 days, unless you log back in to change your mind." },
-  { q: "Something happened that worried me. What do I do?", a: <>Report the person from their profile or chat, and visit our <Link className="text-clay underline underline-offset-4" href="/safety">Safety centre</Link>. In an emergency in India, call 112.</> },
+  { q: "Something happened that worried me. What do I do?", a: <>Report the person from their profile or chat, and visit our <Link className="text-clay underline underline-offset-4" href="/safety">Safety centre</Link>. In an emergency, call your local emergency number.</> },
 ];
 
 export default function FaqPage() {
