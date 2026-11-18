@@ -26,11 +26,11 @@ export function SofaScene({ className, label }: Props) {
       <path d="M88 250 h264 v30 h-264 z" fill="#F3ECE3" {...stroke} />
       <path d="M60 280 v18 M380 280 v18" {...line} />
       {/* two heads leaning together */}
-      <circle cx="200" cy="172" r="22" fill="#FBF7F2" {...stroke} />
-      <circle cx="244" cy="168" r="22" fill="#FBF7F2" {...stroke} />
-      <path d="M180 164 q10 -24 38 -18" {...line} />
-      <path d="M228 152 q20 -14 36 4 q4 10 0 20" {...line} />
-      <path d="M193 176 q6 4 12 0 M238 172 q6 4 12 0" {...line} />
+      <circle cx="200" cy="154" r="22" fill="#FBF7F2" {...stroke} />
+      <circle cx="244" cy="151" r="22" fill="#FBF7F2" {...stroke} />
+      <path d="M180 146 q10 -24 38 -18" {...line} />
+      <path d="M228 135 q20 -14 36 4 q4 10 0 20" {...line} />
+      <path d="M193 158 q6 4 12 0 M238 155 q6 4 12 0" {...line} />
       {/* blanket */}
       <path d="M140 190 q100 -30 200 0 l12 64 q-110 24 -224 0 z" fill="#F2BFA4" {...stroke} />
       <path d="M170 196 l-8 52 M210 188 l-4 64 M250 186 l2 66 M290 190 l8 60" stroke="#2E2522" strokeWidth="1" opacity="0.35" fill="none" />

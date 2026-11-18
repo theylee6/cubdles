@@ -36,7 +36,7 @@ export default function HomePage() {
             <SofaScene className="w-full" label="Two people sharing a blanket on a sofa" />
             <figure
               aria-label="Example of a Cubdles profile card"
-              className="absolute -bottom-10 -left-2 w-60 rounded-[var(--radius-card)] bg-cream p-4 shadow-[var(--shadow-float)] ring-1 ring-oat sm:left-6"
+              className="absolute -bottom-10 -left-2 w-64 rounded-[var(--radius-card)] bg-cream p-4 shadow-[var(--shadow-float)] ring-1 ring-oat sm:left-6"
             >
               <figcaption className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-mocha">Example profile</figcaption>
               <p className="font-display text-xl text-cocoa">Meera, 29</p>
