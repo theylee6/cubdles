@@ -110,3 +110,9 @@ test("safety page explains country advisories and background checks", async ({ p
   await expect(page.locator("#travel-and-local-laws")).toBeVisible();
   await expect(page.locator("#background-checks")).toBeVisible();
 });
+
+test("email links without a valid code or token land on login with a clear message", async ({ page }) => {
+  await page.goto("/auth/confirm?next=/app");
+  await expect(page).toHaveURL(/\/login\?error=link/);
+  await expect(page.getByText(/expired or was already used/i)).toBeVisible();
+});

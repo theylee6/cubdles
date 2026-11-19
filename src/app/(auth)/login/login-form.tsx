@@ -13,6 +13,7 @@ import type { FormState } from "@/lib/auth/schemas";
 const LINK_ERRORS: Record<string, string> = {
   link: "That link has expired or was already used. Please log in, or request a new link.",
   callback: "We couldn't finish signing you in. Please try again.",
+  link_other_browser: "Your email is confirmed. Log in below to carry on (the link opened in a different browser).",
   not_configured: "Sign-in isn't switched on yet. Please try again later.",
   google_unavailable: "Google sign-in isn't available right now. Please use email instead.",
   apple_unavailable: "Apple sign-in isn't available right now. Please use email instead.",

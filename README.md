@@ -33,7 +33,7 @@ The site runs without Supabase configured: public pages work, and anything that 
    ```
    Load the world cities once per project with the `load-cities` Edge Function (instructions at the top of `supabase/functions/load-cities/index.ts`). Load development catalogue and placeholder plans on **staging only**: run `supabase/seed.sql` in the SQL editor. Never run the seed on production — set real prices in the admin dashboard (M5) or the SQL editor.
 3. **Auth → URL configuration:** Site URL = your domain; add `http://localhost:3000/**` and your Vercel preview URL pattern to Redirect URLs.
-4. **Auth → Email templates:** point links at our confirm route so they work with server-side sessions:
+4. **Auth → Email templates** (optional; editable only once custom SMTP is set up). Supabase's default templates work as they are: the link must be opened in the same browser that signed up. These custom links also work across browsers:
    - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/app`
    - Reset password: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password/new`
    - Change email: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/app`
