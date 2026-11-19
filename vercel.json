@@ -1,4 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [{ "path": "/api/cron/purge-accounts", "schedule": "30 21 * * *" }]
+  "framework": "nextjs",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build",
+  "crons": [
+    {
+      "path": "/api/cron/purge-accounts",
+      "schedule": "30 21 * * *"
+    }
+  ]
 }
