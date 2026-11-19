@@ -1,26 +1,70 @@
-import { z } from "zod";
+import { cleanValue, EnvError, isEmail, normalizeUrl } from "./env-parse";
 
 /**
  * Public environment variables (safe for the browser).
  * Server-only secrets are read in src/lib/env.server.ts and never imported by client code.
+ * NEXT_PUBLIC_* values are inlined at build time, so each is read by its literal name.
  */
-const publicSchema = z.object({
-  NEXT_PUBLIC_SITE_URL: z.url().default("http://localhost:3000"),
-  NEXT_PUBLIC_SUPABASE_URL: z.url().optional(),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(20).optional(),
-  NEXT_PUBLIC_SUPPORT_EMAIL: z.email().optional(),
-});
+function siteUrl(): string {
+  const explicit = normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL);
+  if (explicit) return explicit;
+  if (explicit === null) {
+    console.warn(
+      "NEXT_PUBLIC_SITE_URL is not a valid web address; falling back to the deployment URL.",
+    );
+  }
+  // Vercel exposes the production domain automatically.
+  return (
+    normalizeUrl(process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL) ||
+    "http://localhost:3000"
+  );
+}
 
-export const publicEnv = publicSchema.parse({
-  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || undefined,
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || undefined,
-  NEXT_PUBLIC_SUPPORT_EMAIL: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || undefined,
-});
+function supabaseUrl(): string | undefined {
+  const url = normalizeUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  if (url === null) {
+    throw new EnvError(
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "is not a valid web address (expected https://<ref>.supabase.co)",
+    );
+  }
+  return url;
+}
+
+function supportEmail(): string | undefined {
+  const v = cleanValue(process.env.NEXT_PUBLIC_SUPPORT_EMAIL);
+  if (v && !isEmail(v)) {
+    console.warn(
+      "NEXT_PUBLIC_SUPPORT_EMAIL is not a valid email address; ignoring it.",
+    );
+    return undefined;
+  }
+  return v;
+}
+
+function publishableKey(): string | undefined {
+  const v = cleanValue(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  if (v && v.length < 20)
+    throw new EnvError(
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      "looks incomplete",
+    );
+  return v;
+}
+
+export const publicEnv = {
+  NEXT_PUBLIC_SITE_URL: siteUrl(),
+  NEXT_PUBLIC_SUPABASE_URL: supabaseUrl(),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishableKey(),
+  NEXT_PUBLIC_SUPPORT_EMAIL: supportEmail(),
+} as const;
 
 /** True only when Supabase has been configured. Features that need it say so instead of pretending. */
 export function isSupabaseConfigured(): boolean {
-  return Boolean(publicEnv.NEXT_PUBLIC_SUPABASE_URL && publicEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  return Boolean(
+    publicEnv.NEXT_PUBLIC_SUPABASE_URL &&
+    publicEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  );
 }
 
 export function supabaseCredentials() {
