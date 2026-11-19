@@ -78,6 +78,18 @@ Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `l
 | `my_safety_advisory()` | The signed-in member's advisory, or null |
 | `private.has_feature` | Incognito is free where `advisory = 'same_sex_criminalised'` |
 
+## Migration 8 — messaging (2026-11-20)
+
+| Object | Purpose |
+| --- | --- |
+| `messages` | Text messages per match (RLS: participants of an active match; no direct writes) |
+| `match_reads` | Each member's read position per conversation (other's row visible only with mutual read receipts) |
+| `matches.last_message_at` | Orders the conversation list |
+| `send_message(match, body, client_id)` | Validated, idempotent, rate-limited send |
+| `mark_conversation_read`, `conversation_seen_at` | Read state and "Seen" |
+| `my_conversations()`, `unread_conversations_count()` | Conversation list and nav badge |
+| `private.in_active_match`, `private.shares_read_receipts` | Policy helpers |
+
 ## Coming in later migrations
 
 Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

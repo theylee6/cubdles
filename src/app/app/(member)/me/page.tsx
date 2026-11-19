@@ -29,23 +29,38 @@ async function Me() {
         title="Your profile"
         subtitle="This is how others see you."
         actions={
-          <Link href="/app/settings" className={buttonClasses("secondary", "sm")}>
+          <Link
+            href="/app/settings"
+            className={buttonClasses("secondary", "sm")}
+          >
             <Settings className="size-4" aria-hidden /> Settings
           </Link>
         }
       />
       <SavedNotice />
       <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
-        <div className="mx-auto w-full max-w-md">{card ? <ProfileView card={card} /> : null}</div>
-        <nav aria-label="Edit your profile" className="flex flex-col gap-2 self-start">
+        <div className="mx-auto w-full max-w-md">
+          {card ? <ProfileView card={card} /> : null}
+        </div>
+        <nav
+          aria-label="Edit your profile"
+          className="flex flex-col gap-2 self-start"
+        >
           <h2 className="mb-1 text-lg">Edit</h2>
           {EDIT_SECTIONS.map((s) => (
-            <Link key={s.slug} href={`/app/me/edit/${s.slug}`} className="flex items-center justify-between rounded-2xl bg-cream px-4 py-3 ring-1 ring-oat hover:bg-linen">
+            <Link
+              key={s.slug}
+              href={`/app/me/edit/${s.slug}`}
+              className="flex items-center justify-between rounded-2xl bg-cream px-4 py-3 ring-1 ring-oat hover:bg-linen"
+            >
               {s.label}
               <ChevronRight className="size-4 text-mocha" aria-hidden />
             </Link>
           ))}
-          <p className="mt-2 text-xs text-mocha">Your preview includes photos still in review; others only see approved ones.</p>
+          <p className="mt-2 text-xs text-mocha">
+            Your preview includes photos still in review; others only see
+            approved ones.
+          </p>
         </nav>
       </div>
     </>

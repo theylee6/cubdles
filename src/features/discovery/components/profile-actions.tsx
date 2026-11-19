@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Ban, Heart, HeartOff, Star, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Ban, Heart, HeartOff, MessageCircle, Star, X } from "lucide-react";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { blockAction, swipeAction, unmatchAction } from "../actions";
 import type { ProfileCard } from "../types";
 import { MatchDialog } from "./match-dialog";
@@ -21,13 +21,22 @@ export function ProfileActions({ card }: { card: ProfileCard }) {
       const r = await swipeAction(card.id, action);
       if (!r.ok) return setMessage(r.message);
       setMessage(null);
-      if (r.matched) setMatchCard(card);
-      else setDone(action === "pass" ? "Okay — we won't show them again." : "Like sent.");
+      if (r.matched) setMatchCard({ ...card, match_id: r.matchId });
+      else
+        setDone(
+          action === "pass" ? "Okay — we won't show them again." : "Like sent.",
+        );
     });
   }
 
   function unmatch() {
-    if (!card.match_id || !window.confirm(`Unmatch ${card.display_name}? You won't see each other again.`)) return;
+    if (
+      !card.match_id ||
+      !window.confirm(
+        `Unmatch ${card.display_name}? You won't see each other again.`,
+      )
+    )
+      return;
     start(async () => {
       const r = await unmatchAction(card.match_id!);
       if (!r.ok) return setMessage(r.message ?? null);
@@ -36,7 +45,12 @@ export function ProfileActions({ card }: { card: ProfileCard }) {
   }
 
   function block() {
-    if (!window.confirm(`Block ${card.display_name}? You'll be hidden from each other everywhere on Cubdles.`)) return;
+    if (
+      !window.confirm(
+        `Block ${card.display_name}? You'll be hidden from each other everywhere on Cubdles.`,
+      )
+    )
+      return;
     start(async () => {
       const r = await blockAction(card.id);
       if (!r.ok) return setMessage(r.message ?? null);
@@ -47,7 +61,10 @@ export function ProfileActions({ card }: { card: ProfileCard }) {
   return (
     <div className="flex flex-col gap-3">
       {message ? (
-        <p role="alert" className="rounded-2xl bg-blush-soft px-4 py-3 text-sm ring-1 ring-blush">
+        <p
+          role="alert"
+          className="rounded-2xl bg-blush-soft px-4 py-3 text-sm ring-1 ring-blush"
+        >
           {message}
         </p>
       ) : null}
@@ -56,15 +73,28 @@ export function ProfileActions({ card }: { card: ProfileCard }) {
           {done}
         </p>
       ) : card.match_id ? (
-        <Button variant="secondary" onClick={unmatch} disabled={pending}>
-          <HeartOff className="size-4" aria-hidden /> Unmatch
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <ButtonLink href={`/app/matches/${card.match_id}`}>
+            <MessageCircle className="size-4" aria-hidden /> Message
+          </ButtonLink>
+          <Button variant="secondary" onClick={unmatch} disabled={pending}>
+            <HeartOff className="size-4" aria-hidden /> Unmatch
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-3 gap-2">
-          <Button variant="secondary" onClick={() => swipe("pass")} disabled={pending}>
+          <Button
+            variant="secondary"
+            onClick={() => swipe("pass")}
+            disabled={pending}
+          >
             <X className="size-4" aria-hidden /> Pass
           </Button>
-          <Button variant="secondary" onClick={() => swipe("super")} disabled={pending}>
+          <Button
+            variant="secondary"
+            onClick={() => swipe("super")}
+            disabled={pending}
+          >
             <Star className="size-4" aria-hidden /> Super
           </Button>
           <Button onClick={() => swipe("like")} disabled={pending}>
@@ -72,10 +102,22 @@ export function ProfileActions({ card }: { card: ProfileCard }) {
           </Button>
         </div>
       )}
-      <Button variant="ghost" size="sm" onClick={block} disabled={pending} className="self-center text-mocha">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={block}
+        disabled={pending}
+        className="self-center text-mocha"
+      >
         <Ban className="size-4" aria-hidden /> Block {card.display_name}
       </Button>
-      <MatchDialog card={matchCard} onClose={() => { setMatchCard(null); router.refresh(); }} />
+      <MatchDialog
+        card={matchCard}
+        onClose={() => {
+          setMatchCard(null);
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

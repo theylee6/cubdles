@@ -177,6 +177,18 @@ export type Database = {
         Update: { created_at?: string; from_id?: string; to_id?: string }
         Relationships: []
       }
+      messages: {
+        Row: { id: string; match_id: string; sender_id: string; body: string; client_id: string; created_at: string }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      match_reads: {
+        Row: { match_id: string; profile_id: string; last_read_at: string }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       matches: {
         Row: {
           created_at: string
@@ -184,6 +196,7 @@ export type Database = {
           ended_by: string | null
           ended_reason: Database["public"]["Enums"]["match_end_reason"] | null
           id: string
+          last_message_at: string | null
           user_a: string
           user_b: string
         }
@@ -655,6 +668,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      send_message: {
+        Args: { p_match_id: string; p_body: string; p_client_id: string }
+        Returns: { id: string; match_id: string; sender_id: string; body: string; client_id: string; created_at: string }
+      }
+      mark_conversation_read: { Args: { p_match_id: string }; Returns: undefined }
+      my_conversations: {
+        Args: never
+        Returns: {
+          match_id: string
+          other_id: string
+          matched_at: string
+          last_message_at: string | null
+          last_message_preview: string | null
+          last_message_mine: boolean | null
+          unread_count: number
+        }[]
+      }
+      unread_conversations_count: { Args: never; Returns: number }
+      conversation_seen_at: { Args: { p_match_id: string }; Returns: string | null }
       accept_terms: { Args: { p_marketing?: boolean }; Returns: undefined }
       age_in_years: { Args: { birth: string }; Returns: number }
       compact_photo_positions: { Args: never; Returns: undefined }

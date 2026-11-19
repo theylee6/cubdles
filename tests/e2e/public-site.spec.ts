@@ -116,3 +116,10 @@ test("email links without a valid code or token land on login with a clear messa
   await expect(page).toHaveURL(/\/login\?error=link/);
   await expect(page.getByText(/expired or was already used/i)).toBeVisible();
 });
+
+test("chat links are protected: malformed ids 404, real ones need a login", async ({ page }) => {
+  const bad = await page.goto("/app/matches/not-a-real-id");
+  expect(bad?.status()).toBe(404);
+  await page.goto("/app/matches/00000000-0000-0000-0000-000000000000");
+  await expect(page.getByText(/welcome back|accounts aren't connected yet/i).first()).toBeVisible();
+});

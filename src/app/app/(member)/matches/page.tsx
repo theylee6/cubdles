@@ -1,12 +1,11 @@
 import { Suspense } from "react";
-import { PersonList } from "@/features/discovery/components/person-list";
-import { getMatches } from "@/features/discovery/data";
 import { PageHeader, PageSkeleton } from "@/features/member/page-header";
+import { ConversationList } from "@/features/messaging/components/conversation-list";
+import { LiveRefresh } from "@/features/messaging/components/live-refresh";
+import { getConversations, getMemberTimeZone } from "@/features/messaging/data";
 import { requireActiveMember } from "@/lib/auth/member";
 
 export const metadata = { title: "Matches" };
-
-const dateFmt = new Intl.DateTimeFormat("en", { day: "numeric", month: "short" });
 
 export default function MatchesPage() {
   return (
@@ -18,16 +17,22 @@ export default function MatchesPage() {
 
 async function Matches() {
   const me = await requireActiveMember("/app/matches");
-  const matches = await getMatches(me.id);
-  const byCard = new Map(matches.map((m) => [m.card.id, m]));
+  const [items, timeZone] = await Promise.all([
+    getConversations(),
+    getMemberTimeZone(me.id),
+  ]);
   return (
     <>
-      <PageHeader title="Matches" subtitle="People who said yes too. Messaging arrives in the next update." />
-      <PersonList
-        cards={matches.map((m) => m.card)}
-        emptyText="No matches yet. When you and someone both like each other, they'll appear here."
-        meta={(c) => `Matched ${dateFmt.format(new Date(byCard.get(c.id)!.createdAt))}`}
+      <PageHeader
+        title="Matches"
+        subtitle="People who said yes too. Pick up a conversation or start a new one."
       />
+      <ConversationList
+        items={items}
+        nowIso={new Date().toISOString()}
+        timeZone={timeZone}
+      />
+      <LiveRefresh />
     </>
   );
 }

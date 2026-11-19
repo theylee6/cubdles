@@ -5,13 +5,25 @@ import { useState, useTransition } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/primitives";
-import { CUDDLE_STYLES, INTENTIONS, PACES } from "@/features/onboarding/options";
+import {
+  CUDDLE_STYLES,
+  INTENTIONS,
+  PACES,
+} from "@/features/onboarding/options";
 import { cn } from "@/lib/utils";
 import { loadDiscoverPage } from "../actions";
 import type { DiscoverFilters, ProfileCard } from "../types";
 
 /** Grid browsing with filters. Intention filtering is free; the rest needs Cubdles Plus (enforced in the DB). */
-export function BrowseView({ initial, initialNext, advancedAllowed }: { initial: ProfileCard[]; initialNext: number | null; advancedAllowed: boolean }) {
+export function BrowseView({
+  initial,
+  initialNext,
+  advancedAllowed,
+}: {
+  initial: ProfileCard[];
+  initialNext: number | null;
+  advancedAllowed: boolean;
+}) {
   const [filters, setFilters] = useState<DiscoverFilters>({});
   const [cards, setCards] = useState(initial);
   const [next, setNext] = useState(initialNext);
@@ -26,12 +38,17 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
         return;
       }
       setMessage(null);
-      setCards((prev) => (offset === 0 ? page.cards : [...prev, ...page.cards]));
+      setCards((prev) =>
+        offset === 0 ? page.cards : [...prev, ...page.cards],
+      );
       setNext(page.nextOffset);
     });
   }
 
-  function toggle(key: "intentions" | "cuddle_styles" | "paces", value: string) {
+  function toggle(
+    key: "intentions" | "cuddle_styles" | "paces",
+    value: string,
+  ) {
     const cur = new Set(filters[key] ?? []);
     if (cur.has(value)) cur.delete(value);
     else cur.add(value);
@@ -51,28 +68,49 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
 
   return (
     <div className="flex flex-col gap-6">
-      <section aria-label="Filters" className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-linen/70 p-4 ring-1 ring-oat">
+      <section
+        aria-label="Filters"
+        className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-linen/70 p-4 ring-1 ring-oat"
+      >
         <FilterRow label="Looking for">
           {INTENTIONS.map((o) => (
-            <FilterChip key={o.value} on={filters.intentions?.includes(o.value)} onClick={() => toggle("intentions", o.value)}>
+            <FilterChip
+              key={o.value}
+              on={filters.intentions?.includes(o.value)}
+              onClick={() => toggle("intentions", o.value)}
+            >
               {o.label}
             </FilterChip>
           ))}
         </FilterRow>
         <FilterRow label="Cuddle style" locked={!advancedAllowed}>
           {CUDDLE_STYLES.map((o) => (
-            <FilterChip key={o.value} disabled={!advancedAllowed} on={filters.cuddle_styles?.includes(o.value)} onClick={() => toggle("cuddle_styles", o.value)}>
+            <FilterChip
+              key={o.value}
+              disabled={!advancedAllowed}
+              on={filters.cuddle_styles?.includes(o.value)}
+              onClick={() => toggle("cuddle_styles", o.value)}
+            >
               {o.label}
             </FilterChip>
           ))}
         </FilterRow>
         <FilterRow label="Pace" locked={!advancedAllowed}>
           {PACES.map((o) => (
-            <FilterChip key={o.value} disabled={!advancedAllowed} on={filters.paces?.includes(o.value)} onClick={() => toggle("paces", o.value)}>
+            <FilterChip
+              key={o.value}
+              disabled={!advancedAllowed}
+              on={filters.paces?.includes(o.value)}
+              onClick={() => toggle("paces", o.value)}
+            >
               {o.label}
             </FilterChip>
           ))}
-          <FilterChip disabled={!advancedAllowed} on={Boolean(filters.recently_active_days)} onClick={toggleRecent}>
+          <FilterChip
+            disabled={!advancedAllowed}
+            on={Boolean(filters.recently_active_days)}
+            onClick={toggleRecent}
+          >
             Active this week
           </FilterChip>
         </FilterRow>
@@ -80,7 +118,10 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
           <p className="text-sm text-mocha">
             <Lock className="mr-1 inline size-3.5" aria-hidden />
             Cuddle style, pace and activity filters come with{" "}
-            <Link href="/pricing" className="text-clay underline underline-offset-4">
+            <Link
+              href="/pricing"
+              className="text-clay underline underline-offset-4"
+            >
               Cubdles Plus
             </Link>
             .
@@ -89,20 +130,36 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
       </section>
 
       {message ? (
-        <p role="alert" className="rounded-2xl bg-blush-soft px-4 py-3 text-sm ring-1 ring-blush">
+        <p
+          role="alert"
+          className="rounded-2xl bg-blush-soft px-4 py-3 text-sm ring-1 ring-blush"
+        >
           {message}
         </p>
       ) : null}
 
       {cards.length ? (
-        <ul className={cn("grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4", pending && "opacity-60")} aria-busy={pending}>
+        <ul
+          className={cn(
+            "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
+            pending && "opacity-60",
+          )}
+          aria-busy={pending}
+        >
           {cards.map((c) => (
             <li key={c.id}>
-              <Link href={`/app/profile/${c.id}`} className="group block overflow-hidden rounded-[var(--radius-card)] bg-cream ring-1 ring-oat">
+              <Link
+                href={`/app/profile/${c.id}`}
+                className="group block overflow-hidden rounded-[var(--radius-card)] bg-cream ring-1 ring-oat"
+              >
                 <div className="aspect-[4/5] bg-linen">
                   {c.photos[0]?.url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.photos[0].url} alt="" className="size-full object-cover transition-transform group-hover:scale-[1.02]" />
+                    <img
+                      src={c.photos[0].url}
+                      alt=""
+                      className="size-full object-cover transition-transform group-hover:scale-[1.02]"
+                    />
                   ) : null}
                 </div>
                 <div className="p-3">
@@ -110,7 +167,9 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
                     {c.display_name}
                     {c.age ? `, ${c.age}` : ""}
                   </p>
-                  <p className="text-xs text-mocha">{c.distance_label ?? c.city}</p>
+                  <p className="text-xs text-mocha">
+                    {c.distance_label ?? c.city}
+                  </p>
                 </div>
               </Link>
             </li>
@@ -124,7 +183,11 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
 
       {next !== null && cards.length ? (
         <div className="flex justify-center">
-          <Button variant="secondary" disabled={pending} onClick={() => load(filters, next)}>
+          <Button
+            variant="secondary"
+            disabled={pending}
+            onClick={() => load(filters, next)}
+          >
             {pending ? "Loading…" : "Show more"}
           </Button>
         </div>
@@ -133,21 +196,50 @@ export function BrowseView({ initial, initialNext, advancedAllowed }: { initial:
   );
 }
 
-function FilterRow({ label, locked, children }: { label: string; locked?: boolean; children: React.ReactNode }) {
+function FilterRow({
+  label,
+  locked,
+  children,
+}: {
+  label: string;
+  locked?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-2" role="group" aria-label={label}>
       <p className="text-sm font-medium">
         {label}
-        {locked ? <Lock className="ml-1.5 inline size-3.5 text-mocha" aria-label="Cubdles Plus" /> : null}
+        {locked ? (
+          <Lock
+            className="ml-1.5 inline size-3.5 text-mocha"
+            aria-label="Cubdles Plus"
+          />
+        ) : null}
       </p>
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
 }
 
-function FilterChip({ on, disabled, onClick, children }: { on?: boolean; disabled?: boolean; onClick: () => void; children: React.ReactNode }) {
+function FilterChip({
+  on,
+  disabled,
+  onClick,
+  children,
+}: {
+  on?: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <button type="button" aria-pressed={Boolean(on)} disabled={disabled} onClick={onClick} className="rounded-full disabled:cursor-not-allowed disabled:opacity-50">
+    <button
+      type="button"
+      aria-pressed={Boolean(on)}
+      disabled={disabled}
+      onClick={onClick}
+      className="rounded-full disabled:cursor-not-allowed disabled:opacity-50"
+    >
       <Chip selected={on}>{children}</Chip>
     </button>
   );

@@ -9,7 +9,9 @@ import { requireActiveMember } from "@/lib/auth/member";
 
 export const metadata = { title: "Profile" };
 
-export default function ProfilePage({ params }: PageProps<"/app/profile/[id]">) {
+export default function ProfilePage({
+  params,
+}: PageProps<"/app/profile/[id]">) {
   return (
     <Suspense fallback={<PageSkeleton />}>
       <Profile params={params} />
@@ -17,7 +19,11 @@ export default function ProfilePage({ params }: PageProps<"/app/profile/[id]">) 
   );
 }
 
-async function Profile({ params }: { params: PageProps<"/app/profile/[id]">["params"] }) {
+async function Profile({
+  params,
+}: {
+  params: PageProps<"/app/profile/[id]">["params"];
+}) {
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const me = await requireActiveMember(`/app/profile/${id}`);
@@ -28,7 +34,9 @@ async function Profile({ params }: { params: PageProps<"/app/profile/[id]">["par
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5">
       <ProfileView card={card} />
-      {card.id !== me.id && me.status === "active" ? <ProfileActions card={card} /> : null}
+      {card.id !== me.id && me.status === "active" ? (
+        <ProfileActions card={card} />
+      ) : null}
     </div>
   );
 }

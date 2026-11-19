@@ -7,7 +7,13 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import type { ProfileCard } from "../types";
 
 /** The "it's a match" moment. Native <dialog> for focus trapping and Escape handling. */
-export function MatchDialog({ card, onClose }: { card: ProfileCard | null; onClose: () => void }) {
+export function MatchDialog({
+  card,
+  onClose,
+}: {
+  card: ProfileCard | null;
+  onClose: () => void;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -30,10 +36,20 @@ export function MatchDialog({ card, onClose }: { card: ProfileCard | null; onClo
           <h2 id="match-title" className="text-3xl">
             It&rsquo;s a match
           </h2>
-          <p className="text-mocha">You and {card.display_name} both said yes. Say hello whenever you&rsquo;re ready.</p>
+          <p className="text-mocha">
+            You and {card.display_name} both said yes. Say hello whenever
+            you&rsquo;re ready.
+          </p>
           <div className="flex w-full flex-col gap-3">
-            <Link href="/app/matches" className={buttonClasses("primary", "lg", "w-full")}>
-              Go to matches
+            <Link
+              href={
+                card.match_id ? `/app/matches/${card.match_id}` : "/app/matches"
+              }
+              className={buttonClasses("primary", "lg", "w-full")}
+            >
+              {card.match_id
+                ? `Message ${card.display_name ?? "them"}`
+                : "Go to matches"}
             </Link>
             <Button variant="ghost" onClick={onClose}>
               Keep discovering

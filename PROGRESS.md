@@ -1,26 +1,28 @@
 # Cubdles — development progress
 
-Last updated: 2026-11-18 (global launch support).
+Last updated: 2026-11-20 (M4 messaging; production live at https://cubdles.com).
 
 **Decision (18 Nov): Cubdles launches worldwide.** See plan section 2b. Owner decisions: English first (i18n-ready), UK selfie age estimation, no extra country blocks plus safety advisories, company based in India, Razorpay primary (Stripe India is invite-only) with Stripe as a fallback.
 
 ## Supabase project
 
-- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–7 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–8 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
 - Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
 - Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
-- Still to configure in the dashboard: Auth URLs, email templates, Google/Apple providers, SMTP (see README). Defaults D2–D10 from the Phase 1 plan are assumed (India launch, romantic only, mutual-match messaging) until the owner says otherwise.
+- Auth configured: Site URL https://cubdles.com, redirect URLs, custom SMTP via Resend (sender no-reply@cubdles.com, domain cubdles.com verified), email limit 100/h. Still to do: Google/Apple providers.
+- Production: Vercel project `cubdles-o79f` (functions in Tokyo hnd1, Node 22), GitHub `theylee6/cubdles` main auto-deploys. Sign-up → confirm email → onboarding verified end to end on 2026-11-20.
 
 ## Milestone status
 
 | Milestone | Status |
 | --- | --- |
-| M0 Setup | **Mostly done** — repo, scripts, env example, CI workflow, README. Waiting on: GitHub repo, Vercel and Supabase accounts |
+| M0 Setup | **Done** — GitHub, Vercel (cubdles.com), Supabase, Resend email |
 | M1 Design system + public site | **Done (temporary UI)** — the owner is designing in Figma; current UI is a placeholder layer over reusable components |
 | M2 Auth, onboarding, profiles | **Profile set-up done** — 10-step resumable onboarding, photo pipeline, affection profile, prompts, migration 2. Still to do: phone OTP, profile editing/settings, account deletion, rate limiting |
 | M3 Discovery + matching | **Done** — discovery (swipe + browse + filters), daily picks, transparent compatibility score, likes/super likes/passes with quotas, race-safe mutual matching, liked-you count (list is premium), matches, unmatch, block, profile pages |
 | M2 extras | **Done** — profile editing (same step forms in edit mode), privacy settings, pause, incognito (premium-gated), account deletion with 30-day restore + daily purge job |
-| M4–M8 | Not started (next: M4 messaging + notifications) |
+| M4 Messaging | **Done** — conversations on match, real-time delivery (with polling fallback), optimistic sending with retry, read receipts (mutual, respects privacy), unread badge, unmatch/block from chat, flood limits. Email/push notifications and reporting from chat move to M5 |
+| M5–M8 | Not started (next: M5 safety: reporting, moderation queue, admin; message notifications) |
 
 ## Completed
 
@@ -32,7 +34,7 @@ Last updated: 2026-11-18 (global launch support).
 - SEO: metadata per page, sitemap, robots, web manifest, icon.
 - Auth: email+password sign-up (server-validated, 18+ and terms confirmation), login, Google/Apple OAuth, email confirm + recovery routes, password reset, sign-out, session refresh in `proxy.ts`, protected `/app`.
 - Database migration 1 with RLS on every table, column-level grants, storage bucket policies, age-gate (under-18 suspended + email blocked), location rounding, onboarding completion checks, audited staff status changes.
-- Tests: 54 unit, 146 database permission/behaviour, 46 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
+- Tests: 84 unit, 206 database permission/behaviour, 52 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
 
 ## Profile set-up (onboarding) — how it works
 
@@ -69,9 +71,18 @@ Last updated: 2026-11-18 (global launch support).
 - Members located there see a warning on Discover and Settings, and Incognito is free for them (`private.has_feature`).
 - Safety page: "Where same-sex relationships are against the law".
 
+## Messaging (migration 8) — how it works
+
+- `messages` (text only, 1–2,000 chars, idempotent by sender `client_id`) and `match_reads` (per-member read position). Members can only read; all writes go through `send_message()` / `mark_conversation_read()`.
+- `send_message` checks: you're in the match, it hasn't ended, nobody blocked anyone, both accounts are active/paused; strips control characters; limits 20 messages/minute and 500/day.
+- RLS: messages visible only while the match is active, so unmatch/block hides the conversation for both. The other person's read position is visible only if **both** share read receipts.
+- Realtime: `messages` and `match_reads` are in the `supabase_realtime` publication (RLS applies to subscribers). The chat falls back to polling every 15 s if the live connection fails, and catches up when the tab returns.
+- `my_conversations()` powers the list (preview, unread count); `unread_conversations_count()` the nav badge.
+- UI: `/app/matches` (conversation list, refreshes live), `/app/matches/[matchId]` (chat). Dev preview: `/dev/messages`.
+
 ## Pending (next up)
 
-1. M4: real-time messaging (conversations created on match), notifications, reporting.
+1. M5: reporting (profiles and messages), moderation queue, admin; email notifications for new messages and matches.
 2. Photo moderation: automated scan provider + moderator queue (M5). Until then photos stay `pending` and need approving in the database.
 3. Phone OTP (global SMS provider, e.g. Twilio Verify).
 4. Rate limiting (Upstash) on sign-up, login, contact form and uploads.
@@ -83,7 +94,8 @@ Last updated: 2026-11-18 (global launch support).
 - **Legal pages are drafts** and need a lawyer's review (D8). Grievance Officer details not published.
 - **Signed-in `/app` page is an interim home**: it says plainly that profile set-up is coming next.
 - Database tests use a minimal Supabase stub (`tests/db/_supabase_stub.sql`); also run them against a real Supabase project (`supabase test db`) once one exists.
-- **The full signed-in onboarding journey hasn't been run end to end yet**: it needs a real Supabase project (auth + storage). SQL rules, validation and photo processing are tested separately. Add a Playwright journey against staging once it exists.
+- Signed-in journeys (onboarding, chat) are verified manually on production and by SQL/unit tests; add Playwright journeys against a staging Supabase project.
+- Messages are plain text; no images, voice notes or link previews. No typing indicator yet.
 - Names ending in a dotted word (e.g. "St.John") are rejected by the anti-link rule; rare, but worth revisiting.
 - Photos use plain `<img>` with signed URLs; switch to an image CDN / `next/image` loader in M8.
 - Discovery scores every eligible candidate per request. Fine for launch-city scale; at larger scale, precompute scores (materialised candidate table refreshed by a job).
