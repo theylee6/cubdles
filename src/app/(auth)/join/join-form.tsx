@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { withRecovery } from "@/components/ui/action-recovery";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
@@ -10,7 +11,7 @@ import { signUpAction } from "@/lib/auth/actions";
 import type { FormState } from "@/lib/auth/schemas";
 
 export function JoinForm() {
-  const [state, action, pending] = useActionState<FormState, FormData>(signUpAction, {});
+  const [state, action, pending] = useActionState<FormState, FormData>(withRecovery(signUpAction), {});
   const [show, setShow] = useState(false);
   const e = state.errors ?? {};
 

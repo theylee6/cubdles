@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useTransition, type FormEvent } from "react";
+import { withRecovery } from "./action-recovery";
 
 /**
  * Runs a server action from a form WITHOUT React's automatic form reset,
@@ -9,8 +10,14 @@ import { useActionState, useTransition, type FormEvent } from "react";
  *   const { state, pending, formProps } = useActionForm(saveBasics);
  *   <form {...formProps}>…</form>
  */
-export function useActionForm<S extends object>(action: (prev: S, formData: FormData) => Promise<S>, initial: S = {} as S) {
-  const [state, dispatch] = useActionState<S, FormData>(action, initial as Awaited<S>);
+export function useActionForm<S extends object>(
+  action: (prev: S, formData: FormData) => Promise<S>,
+  initial: S = {} as S,
+) {
+  const [state, dispatch] = useActionState<S, FormData>(
+    withRecovery(action),
+    initial as Awaited<S>,
+  );
   const [pending, startTransition] = useTransition();
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
+import { withRecovery } from "@/components/ui/action-recovery";
 import { OAuthButtons, OrDivider } from "@/components/auth/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
@@ -23,7 +24,7 @@ export function LoginForm() {
   const params = useSearchParams();
   const next = params.get("next") ?? "/app";
   const linkError = LINK_ERRORS[params.get("error") ?? ""];
-  const [state, action, pending] = useActionState<FormState, FormData>(signInAction, {});
+  const [state, action, pending] = useActionState<FormState, FormData>(withRecovery(signInAction), {});
   const e = state.errors ?? {};
 
   return (

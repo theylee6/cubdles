@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { withRecovery } from "@/components/ui/action-recovery";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/primitives";
@@ -8,7 +9,7 @@ import { requestPasswordResetAction, updatePasswordAction } from "@/lib/auth/act
 import type { FormState } from "@/lib/auth/schemas";
 
 export function ResetRequestForm() {
-  const [state, action, pending] = useActionState<FormState, FormData>(requestPasswordResetAction, {});
+  const [state, action, pending] = useActionState<FormState, FormData>(withRecovery(requestPasswordResetAction), {});
   const e = state.errors ?? {};
   if (state.ok) return <Notice title="Check your email">{state.message}</Notice>;
   return (
@@ -25,7 +26,7 @@ export function ResetRequestForm() {
 }
 
 export function NewPasswordForm() {
-  const [state, action, pending] = useActionState<FormState, FormData>(updatePasswordAction, {});
+  const [state, action, pending] = useActionState<FormState, FormData>(withRecovery(updatePasswordAction), {});
   const e = state.errors ?? {};
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
