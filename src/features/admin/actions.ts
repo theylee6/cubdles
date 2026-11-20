@@ -77,3 +77,27 @@ export async function resolveReportAction(
       : undefined,
   };
 }
+
+export async function decideVerificationAction(
+  requestId: string,
+  approve: boolean,
+  note?: string,
+): Promise<Result> {
+  if (!z.uuid().safeParse(requestId).success)
+    return { ok: false, message: "That didn't work." };
+  const supabase = await createClient();
+  const { data: path, error } = await supabase.rpc(
+    "staff_decide_verification",
+    { p_request: requestId, p_approve: approve, p_note: note ?? null },
+  );
+  if (error) return { ok: false, message: staffError(error.message) };
+  // The selfie is only needed for this decision: delete it now.
+  if (path) {
+    const { error: rmError } = await supabase.storage
+      .from("verification-selfies")
+      .remove([path]);
+    if (rmError) console.error("selfie delete failed", rmError.message);
+  }
+  revalidatePath("/admin", "layout");
+  return { ok: true };
+}

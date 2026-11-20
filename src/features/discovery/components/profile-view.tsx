@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, MapPin, Sparkles } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Sparkles,
+  BadgeCheck,
+} from "lucide-react";
 import { AffectionBadge, Chip } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
 import {
@@ -54,6 +60,11 @@ export function ProfileView({
           <h2 className="text-3xl">
             {card.display_name}
             {card.age ? <span className="text-mocha">, {card.age}</span> : null}
+            {card.verified ? (
+              <span className="ml-2 inline-flex translate-y-[-3px] items-center gap-1 rounded-full bg-sage-soft px-2.5 py-0.5 align-middle font-sans text-xs font-medium text-cocoa">
+                <BadgeCheck className="size-3.5" aria-hidden /> Verified
+              </span>
+            ) : null}
           </h2>
           <p className="text-sm text-mocha">
             {[card.gender, card.pronouns].filter(Boolean).join(" · ")}

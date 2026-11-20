@@ -44,7 +44,7 @@ async function Overview() {
         title="Moderation"
         subtitle="Everything you do here is recorded in the audit log."
       />
-      <ul className="grid gap-3 sm:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2">
         {tiles.map((t) => (
           <li key={t.label}>
             <Link

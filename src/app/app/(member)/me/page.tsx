@@ -8,6 +8,8 @@ import { PageHeader, PageSkeleton } from "@/features/member/page-header";
 import { SavedNotice } from "@/features/settings/saved-notice";
 import { EDIT_SECTIONS } from "@/features/settings/sections";
 import { requireActiveMember } from "@/lib/auth/member";
+import { VerificationCard } from "@/features/verification/components/verification-card";
+import { getVerificationState } from "@/features/verification/data";
 
 export const metadata = { title: "Your profile" };
 
@@ -21,7 +23,10 @@ export default function MePage() {
 
 async function Me() {
   const me = await requireActiveMember("/app/me");
-  const [card] = await getCards([me.id]);
+  const [[card], verification] = await Promise.all([
+    getCards([me.id]),
+    getVerificationState(me.id),
+  ]);
 
   return (
     <>
@@ -46,7 +51,8 @@ async function Me() {
           aria-label="Edit your profile"
           className="flex flex-col gap-2 self-start"
         >
-          <h2 className="mb-1 text-lg">Edit</h2>
+          <VerificationCard state={verification} />
+          <h2 className="mt-4 mb-1 text-lg">Edit</h2>
           {EDIT_SECTIONS.map((s) => (
             <Link
               key={s.slug}

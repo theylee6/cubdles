@@ -12,7 +12,13 @@ export type Reason = { code: ReasonCode; value?: string; count?: number };
 
 export type DistanceBucket = "under_5" | "5_10" | "10_25" | "25_50" | "50_plus";
 
-export type CardPhoto = { id: string; path: string; width: number | null; height: number | null; url?: string | null };
+export type CardPhoto = {
+  id: string;
+  path: string;
+  width: number | null;
+  height: number | null;
+  url?: string | null;
+};
 
 export type ProfileCard = {
   id: string;
@@ -42,8 +48,14 @@ export type ProfileCard = {
   interests: string[];
   prompts: { question: string; answer: string }[];
   photos: CardPhoto[];
-  compatibility: { score: number; reasons: Reason[]; parts: Record<string, number> } | null;
+  compatibility: {
+    score: number;
+    reasons: Reason[];
+    parts: Record<string, number>;
+  } | null;
   match_id: string | null;
+  /** Photo-verified by our team (added on the server). */
+  verified?: boolean;
 };
 
 export type SwipeAction = "like" | "super" | "pass";

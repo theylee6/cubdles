@@ -162,3 +162,51 @@ export async function getReportDetail(
   );
   return { ...parsed.data, photoUrls: Object.fromEntries(urls) };
 }
+
+export type PendingVerification = {
+  id: string;
+  profileId: string;
+  name: string;
+  pose: string;
+  selfieUrl: string | null;
+  photoUrls: string[];
+  submittedAt: string;
+};
+
+export async function getPendingVerifications(): Promise<
+  PendingVerification[]
+> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("staff_pending_verifications", {
+    p_limit: 50,
+  });
+  const rows = data ?? [];
+  const selfiePaths = rows.flatMap((r) =>
+    r.selfie_path ? [r.selfie_path] : [],
+  );
+  const { data: selfies } = selfiePaths.length
+    ? await supabase.storage
+        .from("verification-selfies")
+        .createSignedUrls(selfiePaths, SIGNED_TTL)
+    : { data: [] };
+  const selfieUrls = new Map(
+    (selfies ?? []).flatMap((d) =>
+      d.path && d.signedUrl ? [[d.path, d.signedUrl] as const] : [],
+    ),
+  );
+  const photoUrls = await sign(
+    supabase,
+    rows.flatMap((r) => r.photo_paths ?? []),
+  );
+  return rows.map((r) => ({
+    id: r.request_id,
+    profileId: r.profile_id,
+    name: r.display_name ?? "(no name)",
+    pose: r.pose,
+    selfieUrl: r.selfie_path ? (selfieUrls.get(r.selfie_path) ?? null) : null,
+    photoUrls: (r.photo_paths ?? []).flatMap((p) =>
+      photoUrls.get(p) ? [photoUrls.get(p)!] : [],
+    ),
+    submittedAt: r.submitted_at,
+  }));
+}

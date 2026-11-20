@@ -1,4 +1,11 @@
-import { CUDDLE_STYLES, INTENTIONS, LIFESTYLE_FIELDS, LOVE_LANGUAGES, PACES, labelFor } from "@/features/onboarding/options";
+import {
+  CUDDLE_STYLES,
+  INTENTIONS,
+  LIFESTYLE_FIELDS,
+  LOVE_LANGUAGES,
+  PACES,
+  labelFor,
+} from "@/features/onboarding/options";
 import type { DistanceBucket, Reason } from "./types";
 
 /** Turns compatibility reason codes into short, warm copy. Pure — easy to localise later. */
@@ -15,7 +22,9 @@ export function reasonText(r: Reason): string | null {
     case "same_love_language":
       return `You both value ${(labelFor(LOVE_LANGUAGES, r.value) ?? "the same things").toLowerCase()}`;
     case "shared_interests":
-      return r.count === 1 ? "1 shared interest" : `${r.count} shared interests`;
+      return r.count === 1
+        ? "1 shared interest"
+        : `${r.count} shared interests`;
     default:
       return null;
   }
@@ -39,7 +48,10 @@ const DISTANCE: Record<"km" | "mi", Record<DistanceBucket, string>> = {
   },
 };
 
-export function distanceText(bucket: DistanceBucket | null, unit: "km" | "mi" = "km"): string | null {
+export function distanceText(
+  bucket: DistanceBucket | null,
+  unit: "km" | "mi" = "km",
+): string | null {
   return bucket ? DISTANCE[unit][bucket] : null;
 }
 
@@ -56,7 +68,10 @@ export function loveLanguageText(v: string) {
   return labelFor(LOVE_LANGUAGES, v) ?? v;
 }
 
-export function lifestyleText(key: string, value: string | null): string | null {
+export function lifestyleText(
+  key: string,
+  value: string | null,
+): string | null {
   if (!value) return null;
   const field = LIFESTYLE_FIELDS[key as keyof typeof LIFESTYLE_FIELDS];
   if (!field) return null;
@@ -65,7 +80,10 @@ export function lifestyleText(key: string, value: string | null): string | null 
 }
 
 /** "Active today", "Active this week" — never an exact time. */
-export function lastActiveText(iso: string | null, now = Date.now()): string | null {
+export function lastActiveText(
+  iso: string | null,
+  now = Date.now(),
+): string | null {
   if (!iso) return null;
   const hours = (now - Date.parse(iso)) / 36e5;
   if (hours < 24) return "Active today";
@@ -78,13 +96,16 @@ const SWIPE_ERRORS: Record<string, string> = {
   super_like_limit_reached: "You've used this week's super like.",
   premium_required: "That's part of Cubdles Plus.",
   target_unavailable: "This profile isn't available any more.",
-  profile_not_active: "Your profile isn't active, so you can't like people right now.",
+  profile_not_active:
+    "Your profile isn't active, so you can't like people right now.",
   note_too_long: "Notes can be up to 140 characters.",
   match_not_found: "That match has already ended.",
 };
 
 export function swipeErrorKey(message: string | undefined): string {
-  return Object.keys(SWIPE_ERRORS).find((k) => message?.includes(k)) ?? "unknown";
+  return (
+    Object.keys(SWIPE_ERRORS).find((k) => message?.includes(k)) ?? "unknown"
+  );
 }
 
 export function swipeErrorText(key: string): string {

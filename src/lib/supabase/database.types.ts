@@ -290,6 +290,22 @@ export type Database = {
         };
         Relationships: [];
       };
+      verification_requests: {
+        Row: {
+          id: string
+          profile_id: string
+          pose: string
+          storage_path: string | null
+          status: Database["public"]["Enums"]["verification_status"]
+          note: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       messages: {
         Row: {
           id: string;
@@ -770,6 +786,7 @@ export type Database = {
           pronouns: string | null;
           status: Database["public"]["Enums"]["profile_status"];
           status_reason: string | null;
+          verified_at: string | null;
           updated_at: string;
         };
         Insert: {
@@ -846,6 +863,17 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      start_verification: {
+        Args: never
+        Returns: { id: string; profile_id: string; pose: string; storage_path: string | null; status: Database["public"]["Enums"]["verification_status"]; note: string | null; reviewed_by: string | null; reviewed_at: string | null; created_at: string }
+      }
+      submit_verification: { Args: { p_request: string; p_path: string }; Returns: undefined }
+      staff_pending_verifications: {
+        Args: { p_limit?: number }
+        Returns: { request_id: string; profile_id: string; display_name: string | null; pose: string; selfie_path: string | null; photo_paths: string[]; submitted_at: string }[]
+      }
+      staff_decide_verification: { Args: { p_request: string; p_approve: boolean; p_note?: string | null }; Returns: string | null }
+      verified_profiles: { Args: { p_ids: string[] }; Returns: string[] }
       claim_notifications: {
         Args: { p_limit?: number };
         Returns: {
@@ -1043,6 +1071,7 @@ export type Database = {
       };
     };
     Enums: {
+      verification_status: "awaiting_photo" | "pending" | "approved" | "rejected"
       notification_kind: "match" | "message" | "fraud_ban";
       report_reason:
         | "fake_profile"
