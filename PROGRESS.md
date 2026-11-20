@@ -1,12 +1,12 @@
 # Cubdles — development progress
 
-Last updated: 2026-11-20 (M5 safety; production live at https://cubdles.com).
+Last updated: 2026-11-20 (all build milestones done; production live at https://cubdles.com). Remaining work is owner actions — see "Owner checklist".
 
 **Decision (18 Nov): Cubdles launches worldwide.** See plan section 2b. Owner decisions: English first (i18n-ready), UK selfie age estimation, no extra country blocks plus safety advisories, company based in India, Razorpay primary (Stripe India is invite-only) with Stripe as a fallback.
 
 ## Supabase project
 
-- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–9 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–13 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
 - Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
 - Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
 - Auth configured: Site URL https://cubdles.com, redirect URLs, custom SMTP via Resend (sender no-reply@cubdles.com, domain cubdles.com verified), email limit 100/h. Still to do: Google/Apple providers.
@@ -18,12 +18,15 @@ Last updated: 2026-11-20 (M5 safety; production live at https://cubdles.com).
 | --- | --- |
 | M0 Setup | **Done** — GitHub, Vercel (cubdles.com), Supabase, Resend email |
 | M1 Design system + public site | **Done (temporary UI)** — the owner is designing in Figma; current UI is a placeholder layer over reusable components |
-| M2 Auth, onboarding, profiles | **Profile set-up done** — 10-step resumable onboarding, photo pipeline, affection profile, prompts, migration 2. Still to do: phone OTP, profile editing/settings, account deletion, rate limiting |
+| M2 Auth, onboarding, profiles | **Done** — 10-step resumable onboarding, photo pipeline, affection profile, prompts, editing, settings, deletion, rate limits. Phone sign-in not built (needs an SMS provider) |
 | M3 Discovery + matching | **Done** — discovery (swipe + browse + filters), daily picks, transparent compatibility score, likes/super likes/passes with quotas, race-safe mutual matching, liked-you count (list is premium), matches, unmatch, block, profile pages |
 | M2 extras | **Done** — profile editing (same step forms in edit mode), privacy settings, pause, incognito (premium-gated), account deletion with 30-day restore + daily purge job |
 | M4 Messaging | **Done** — conversations on match, real-time delivery (with polling fallback), optimistic sending with retry, read receipts (mutual, respects privacy), unread badge, unmatch/block from chat, flood limits. Email/push notifications and reporting from chat move to M5 |
-| M5 Safety | **Done (core)** — report from profiles and chats (with optional block, urgent triage for under-18/offline safety), photo moderation queue, reports queue with conversation context, warn/suspend/ban with audit log, in-app fraud-ban notices (15 U.S.C. 45g) and warnings. Email notifications need a Resend API key (next) |
-| M6–M8 | Not started (M6 subscriptions & payments, M7 verification & age assurance, M8 hardening & launch) |
+| M5 Safety | **Done** — report from profiles and chats (with optional block, urgent triage), photo moderation queue, reports queue with conversation context, warn/suspend/ban with audit log, fraud-ban notices in-app and by email (15 U.S.C. 45g), warnings |
+| Notifications | **Done** — match/message/fraud-ban emails via Resend with quiet rules, preferences, one-click unsubscribe; scheduler live in production (sends once `RESEND_API_KEY` is set) |
+| M6 Payments | **Done (needs keys + prices)** — Razorpay subscriptions: checkout, signature verification, webhooks, cancel at period end, plan from subscription, upgrade page, membership settings |
+| M7 Verification | **Photo verification done** (pose selfie, moderator review, badge, selfie deleted after review). UK age assurance needs a provider (owner decision) |
+| M8 Hardening | **Done** — CSP + security headers, DB-backed rate limits, download-my-data, social buttons only when enabled, stale-deploy recovery. Not done: error monitoring (needs Sentry), image CDN |
 
 ## Completed
 
@@ -35,7 +38,7 @@ Last updated: 2026-11-20 (M5 safety; production live at https://cubdles.com).
 - SEO: metadata per page, sitemap, robots, web manifest, icon.
 - Auth: email+password sign-up (server-validated, 18+ and terms confirmation), login, Google/Apple OAuth, email confirm + recovery routes, password reset, sign-out, session refresh in `proxy.ts`, protected `/app`.
 - Database migration 1 with RLS on every table, column-level grants, storage bucket policies, age-gate (under-18 suspended + email blocked), location rounding, onboarding completion checks, audited staff status changes.
-- Tests: 89 unit, 239 database permission/behaviour, 54 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
+- Tests: 98 unit, 293 database permission/behaviour, 56 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
 
 ## Profile set-up (onboarding) — how it works
 
@@ -93,17 +96,31 @@ Last updated: 2026-11-20 (M5 safety; production live at https://cubdles.com).
 
 ## Pending (next up)
 
-1. Email notifications (new match, new message after a quiet period, fraud-ban notice by email too) via Resend API (owner adds `RESEND_API_KEY`).
-2. Photo moderation: automated scan provider + moderator queue (M5). Until then photos stay `pending` and need approving in the database.
-3. Phone OTP (global SMS provider, e.g. Twilio Verify).
-4. Rate limiting (Upstash) on sign-up, login, contact form and uploads.
-5. Regenerate `src/lib/supabase/database.types.ts` after every migration.
+Build work is complete; what's left needs the owner (see checklist below). Next build candidates once those are done:
+1. Phone sign-in (needs an SMS provider, e.g. Twilio Verify).
+2. UK age assurance (needs a provider, e.g. Yoti) before UK marketing.
+3. Error monitoring (Sentry) and an image CDN.
+4. Automated photo scanning (image-moderation API) as volume grows.
+5. Regenerate `src/lib/supabase/database.types.ts` from Supabase (types are currently hand-maintained per migration).
+
+## Owner checklist
+
+| # | What | Where | Unblocks |
+| --- | --- | --- | --- |
+| 1 | Make yourself admin (SQL in README step 7) | Supabase SQL editor | /admin, approving photos (nobody appears in Discover until a photo is approved) |
+| 2 | Add `RESEND_API_KEY` | Resend → Vercel env | Match/message/fraud-ban emails (scheduler already running) |
+| 3 | Delete duplicate Vercel projects (keep `cubdles-o79f`) | Vercel | Tidiness, avoids wrong deploys |
+| 4 | Razorpay: activate account, Subscriptions + International; create Plus plans; add keys + webhook; insert prices (README "Payments") | Razorpay, Vercel, SQL editor | Selling Plus |
+| 5 | Decide Plus prices per currency | You | Step 4 |
+| 6 | Google sign-in (optional), then `NEXT_PUBLIC_AUTH_PROVIDERS=google` | Google Cloud, Supabase, Vercel | Google button |
+| 7 | Optional: set `NEXT_PUBLIC_SUPPORT_EMAIL` to a monitored inbox | Vercel | Support address on site and in safety emails |
+| 8 | Lawyer + CA: finalise Terms/Privacy, refund policy, grievance officer, GST LUT, EU OSS/UK VAT, EU/UK representatives, sanctions list | External | Launch compliance |
+| 9 | Choose a UK age-assurance provider (G2) | You | UK launch |
+| 10 | Staff the moderation queue (who reviews, how fast; police escalation) | You | Launch |
 
 ## Known issues / limitations
 
-- **Contact form has no rate limiting yet** (honeypot only). Add Upstash before launch.
 - **Legal pages are drafts** and need a lawyer's review (D8). Grievance Officer details not published.
-- **Signed-in `/app` page is an interim home**: it says plainly that profile set-up is coming next.
 - Database tests use a minimal Supabase stub (`tests/db/_supabase_stub.sql`); also run them against a real Supabase project (`supabase test db`) once one exists.
 - Signed-in journeys (onboarding, chat) are verified manually on production and by SQL/unit tests; add Playwright journeys against a staging Supabase project.
 - Messages are plain text; no images, voice notes or link previews. No typing indicator yet.
@@ -111,8 +128,10 @@ Last updated: 2026-11-20 (M5 safety; production live at https://cubdles.com).
 - Photos use plain `<img>` with signed URLs; switch to an image CDN / `next/image` loader in M8.
 - Discovery scores every eligible candidate per request. Fine for launch-city scale; at larger scale, precompute scores (materialised candidate table refreshed by a job).
 - Swipe deck re-queries from offset 0 when it runs low (offsets shift as people are liked/passed); browse uses offsets and may show a person twice after acting on them.
-- Fraud-ban notices are in-app only until email notifications ship; members who stopped opening the app won't see them yet.
+- Fraud-ban emails send only once `RESEND_API_KEY` is set; until then notices are in-app only (and queued for email).
 - No automated photo scanning yet: every photo is reviewed by a person. Add an image-moderation provider before volume grows.
-- UK: highly effective age assurance for UK members is needed before UK launch (decision G2, verification provider in M7).
+- UK: highly effective age assurance for UK members is needed before UK launch (decision G2). Photo verification is not age assurance.
+- Verified badge isn't revoked when photos change; re-verification on photo change is a future improvement.
+- Razorpay flow is built against the documented API but untested end to end until test keys exist: run one test-mode purchase before going live.
 - India-based company: EU/UK representatives, EU OSS and UK VAT registration, GST LUT for exports, Razorpay international + subscriptions activation, legal review — owner actions.
 - English only; strings are not yet extracted for translation (G1).

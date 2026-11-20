@@ -99,6 +99,38 @@ Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `l
 | `create_report()`, `dismiss_safety_notice()`, `my_staff_roles()` | Member-facing |
 | `staff_queue_counts`, `staff_pending_photos`, `staff_moderate_photo`, `staff_list_reports`, `staff_report_detail`, `staff_resolve_report` | Moderator-only, audited |
 
+## Migration 10 — limits and export
+
+| Object | Purpose |
+| --- | --- |
+| `private.rate_limits`, `rate_limit_hit()` | Fixed-window limits keyed by hash (server only): sign-up, log-in, reset, contact, data export |
+| `export_my_data()` | "Download my data" (everything about the signed-in member, no raw coordinates) |
+
+## Migration 11 — notifications
+
+| Object | Purpose |
+| --- | --- |
+| `notification_settings` | Email preferences (matches, messages); safety notices have no opt-out |
+| `notification_outbox` | Queue filled by triggers on matches, messages, fraud-ban notices |
+| `claim_notifications`, `complete_notification`, `notifications_due` | Server-only dispatch with skip rules (read, active, opted out, cooldown) and retries |
+| pg_cron job `dispatch-notification-emails` | Every 2 min, calls the app only when something is due (per-environment setup script) |
+
+## Migration 12 — verification
+
+| Object | Purpose |
+| --- | --- |
+| `profiles.verified_at`, `verification_requests`, bucket `verification-selfies` | Pose-selfie verification reviewed by moderators; selfie deleted after decision |
+| `start_verification`, `submit_verification`, `staff_pending_verifications`, `staff_decide_verification`, `verified_profiles` | Flow and badge |
+
+## Migration 13 — payments
+
+| Object | Purpose |
+| --- | --- |
+| `subscriptions`, `payment_events` | Razorpay subscriptions; webhook idempotency |
+| `private.current_plan_code` | Plan from subscription (active/authenticated/pending; cancelled until period end) |
+| `my_membership`, `upsert_subscription`, `update_subscription_status` | Member view; server-only writes |
+| plans `free`, `plus` + entitlements | What each plan includes (prices added by the owner) |
+
 ## Coming in later migrations
 
 Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

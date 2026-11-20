@@ -21,7 +21,9 @@ export default function PrivacyPage() {
             <li><strong>Profile:</strong> name, photos, date of birth, gender, what you&rsquo;re looking for, interests, lifestyle, prompts and your affection profile. Sensitive details like religion are optional.</li>
             <li><strong>Approximate location and time zone:</strong> location is rounded to about 1 km before we store it and used only to suggest people nearby; your time zone sets when daily limits reset.</li>
             <li><strong>Activity:</strong> likes, passes, matches, messages, reports and blocks — needed to run the service and keep it safe.</li>
-            <li><strong>Payments:</strong> handled by our payment provider. We never see or store your full card details.</li>
+            <li><strong>Verification selfie (optional):</strong> if you choose to get verified, our safety team compares one selfie with your profile photos. It is stored privately and deleted as soon as it has been reviewed; we keep only the result.</li>
+            <li><strong>Payments:</strong> handled by our payment provider (Razorpay). We never see or store your full card details; we keep your membership status and billing period.</li>
+            <li><strong>Emails we send:</strong> account, match and message emails go through our email provider (Resend). Message emails never include what was said. You can turn match and message emails off; safety notices are always sent.</li>
             <li><strong>Product analytics:</strong> only with your consent, using pseudonymous identifiers.</li>
           </ul>
 
