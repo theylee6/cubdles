@@ -2,6 +2,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { createClient as createPlainClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { supabaseCredentials } from "@/lib/env";
 import { serverEnv } from "@/lib/env.server";
 import type { Database } from "./database.types";
@@ -12,6 +13,9 @@ import type { Database } from "./database.types";
  */
 export async function createClient() {
   const { url, anonKey } = supabaseCredentials();
+  // Session checks compare token expiry with the current time, which can't happen while a route is
+  // being prerendered or prefetched. Mark every user-scoped read as request-time.
+  await connection();
   const cookieStore = await cookies();
 
   return createServerClient<Database>(url, anonKey, {
