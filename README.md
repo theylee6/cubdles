@@ -63,12 +63,12 @@ The site runs without Supabase configured: public pages work, and anything that 
 ## Payments (Razorpay)
 
 1. In Razorpay, enable **Subscriptions** and **International payments**, then create one **Plan** per price (e.g. Plus monthly in INR, USD, EUR, GBP).
-2. Add each price to the database with its Razorpay plan id (SQL editor):
+2. Prices are already in `plan_prices` (inactive). Create matching Razorpay plans, then link and switch on each one (SQL editor):
    ```sql
-   insert into public.plan_prices (plan_id, period_months, currency, amount_minor, provider, provider_plan_id)
-   select id, 1, 'INR', 49900, 'razorpay', 'plan_XXXXXXXX' from public.plans where code = 'plus';
+   update public.plan_prices set provider_plan_id = 'plan_XXXXXXXX', active = true
+   where currency = 'INR' and period_months = 1 and plan_id = (select id from public.plans where code = 'plus');
    ```
-   `amount_minor` is in the smallest unit (paise, cents) and must match the Razorpay plan.
+   Current prices: INR 49900 / 209900, USD 999 / 4199, EUR 999 / 4199, GBP 899 / 3799 (monthly / 6-monthly, in paise or cents). The Razorpay plan amount must match.
 3. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET` in Vercel.
 4. Razorpay → Webhooks: `https://cubdles.com/api/webhooks/razorpay`, events `subscription.*`, with the same secret.
 5. What Plus includes is data (`entitlements` for plan `plus`); change it in the SQL editor.

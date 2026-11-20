@@ -110,12 +110,12 @@ Build work is complete; what's left needs the owner (see checklist below). Next 
 | 1 | Make yourself admin (SQL in README step 7) | Supabase SQL editor | /admin, approving photos (nobody appears in Discover until a photo is approved) |
 | 2 | Add `RESEND_API_KEY` | Resend → Vercel env | Match/message/fraud-ban emails (scheduler already running) |
 | 3 | Delete duplicate Vercel projects (keep `cubdles-o79f`) | Vercel | Tidiness, avoids wrong deploys |
-| 4 | Razorpay: activate account, Subscriptions + International; create Plus plans; add keys + webhook; insert prices (README "Payments") | Razorpay, Vercel, SQL editor | Selling Plus |
-| 5 | Decide Plus prices per currency | You | Step 4 |
+| 4 | Razorpay: activate account, Subscriptions + International; create the 8 Plus plans below; add keys + webhook; link each plan id (README "Payments") | Razorpay, Vercel, SQL editor | Selling Plus |
+| 5 | ~~Decide Plus prices~~ **Decided 20 Nov:** ₹499/mo, ₹2,099/6 mo; $9.99/mo, $41.99/6 mo; €9.99/mo, €41.99/6 mo; £8.99/mo, £37.99/6 mo. Stored in `plan_prices`, inactive until linked | Done | — |
 | 6 | Google sign-in (optional), then `NEXT_PUBLIC_AUTH_PROVIDERS=google` | Google Cloud, Supabase, Vercel | Google button |
 | 7 | Optional: set `NEXT_PUBLIC_SUPPORT_EMAIL` to a monitored inbox | Vercel | Support address on site and in safety emails |
 | 8 | Lawyer + CA: finalise Terms/Privacy, refund policy, grievance officer, GST LUT, EU OSS/UK VAT, EU/UK representatives, sanctions list | External | Launch compliance |
-| 9 | Choose a UK age-assurance provider (G2) | You | UK launch |
+| 9 | **Decided 20 Nov:** UK stays open but is not marketed; choose an age-assurance provider before any UK promotion (G2) | You | UK marketing |
 | 10 | Staff the moderation queue (who reviews, how fast; police escalation) | You | Launch |
 
 ## Known issues / limitations
