@@ -6,7 +6,13 @@ import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/primitives";
 import { useActionForm } from "@/components/ui/use-action-form";
 import type { FormState } from "@/lib/auth/schemas";
-import { requestDeletion, savePrivacy, setIncognito, setPaused } from "./actions";
+import {
+  requestDeletion,
+  saveEmailSettings,
+  savePrivacy,
+  setIncognito,
+  setPaused,
+} from "./actions";
 
 type Privacy = {
   show_online_status: boolean;
@@ -17,21 +23,57 @@ type Privacy = {
 };
 
 const PRIVACY_FIELDS: { key: keyof Privacy; label: string; hint: string }[] = [
-  { key: "show_online_status", label: "Show when I'm online", hint: "Matches see a dot when you're using Cubdles." },
-  { key: "show_last_active", label: "Show when I was last active", hint: "Shown as “Active today” or “this week”, never an exact time." },
-  { key: "send_read_receipts", label: "Send read receipts", hint: "Matches see when you've read their messages." },
-  { key: "hide_age", label: "Hide my age", hint: "Your age still decides who can see you." },
-  { key: "hide_distance", label: "Hide my distance", hint: "People won't see how far away you are." },
+  {
+    key: "show_online_status",
+    label: "Show when I'm online",
+    hint: "Matches see a dot when you're using Cubdles.",
+  },
+  {
+    key: "show_last_active",
+    label: "Show when I was last active",
+    hint: "Shown as “Active today” or “this week”, never an exact time.",
+  },
+  {
+    key: "send_read_receipts",
+    label: "Send read receipts",
+    hint: "Matches see when you've read their messages.",
+  },
+  {
+    key: "hide_age",
+    label: "Hide my age",
+    hint: "Your age still decides who can see you.",
+  },
+  {
+    key: "hide_distance",
+    label: "Hide my distance",
+    hint: "People won't see how far away you are.",
+  },
 ];
 
-function Toggle({ name, label, hint, defaultChecked }: { name: string; label: string; hint: string; defaultChecked: boolean }) {
+function Toggle({
+  name,
+  label,
+  hint,
+  defaultChecked,
+}: {
+  name: string;
+  label: string;
+  hint: string;
+  defaultChecked: boolean;
+}) {
   return (
     <label className="flex cursor-pointer items-start justify-between gap-4 py-3">
       <span>
         <span className="block font-medium">{label}</span>
         <span className="block text-sm text-mocha">{hint}</span>
       </span>
-      <input type="checkbox" role="switch" name={name} defaultChecked={defaultChecked} className="mt-1 size-5 shrink-0 accent-clay" />
+      <input
+        type="checkbox"
+        role="switch"
+        name={name}
+        defaultChecked={defaultChecked}
+        className="mt-1 size-5 shrink-0 accent-clay"
+      />
     </label>
   );
 }
@@ -42,12 +84,65 @@ export function PrivacyForm({ initial }: { initial: Privacy }) {
     <form {...formProps} className="flex flex-col">
       <div className="divide-y divide-oat">
         {PRIVACY_FIELDS.map((f) => (
-          <Toggle key={f.key} name={f.key} label={f.label} hint={f.hint} defaultChecked={initial[f.key]} />
+          <Toggle
+            key={f.key}
+            name={f.key}
+            label={f.label}
+            hint={f.hint}
+            defaultChecked={initial[f.key]}
+          />
         ))}
       </div>
-      {state.message ? <p role="status" className="mt-2 text-sm text-mocha">{state.message}</p> : null}
+      {state.message ? (
+        <p role="status" className="mt-2 text-sm text-mocha">
+          {state.message}
+        </p>
+      ) : null}
       <div className="mt-4">
-        <Button type="submit" disabled={pending}>{pending ? "Saving…" : "Save privacy settings"}</Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? "Saving…" : "Save privacy settings"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+export function EmailSettingsForm({
+  initial,
+}: {
+  initial: { email_matches: boolean; email_messages: boolean };
+}) {
+  const { state, pending, formProps } =
+    useActionForm<FormState>(saveEmailSettings);
+  return (
+    <form {...formProps} className="flex flex-col">
+      <div className="divide-y divide-oat">
+        <Toggle
+          name="email_matches"
+          label="New matches"
+          hint="An email when someone likes you back."
+          defaultChecked={initial.email_matches}
+        />
+        <Toggle
+          name="email_messages"
+          label="New messages"
+          hint="Only if you haven't read it after 10 minutes, at most once an hour per conversation. Never includes the message itself."
+          defaultChecked={initial.email_messages}
+        />
+      </div>
+      <p className="mt-2 text-xs text-mocha">
+        Safety notices (for example, if someone you talked to is banned for
+        fraud) are always sent.
+      </p>
+      {state.message ? (
+        <p role="status" className="mt-2 text-sm text-mocha">
+          {state.message}
+        </p>
+      ) : null}
+      <div className="mt-4">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Saving…" : "Save email settings"}
+        </Button>
       </div>
     </form>
   );
@@ -75,7 +170,9 @@ export function ActionSwitch({
       <label className="flex cursor-pointer items-start justify-between gap-4">
         <span>
           <span className="block font-medium">{label}</span>
-          <span className="block text-sm text-mocha">{disabledReason ?? hint}</span>
+          <span className="block text-sm text-mocha">
+            {disabledReason ?? hint}
+          </span>
         </span>
         <input
           type="checkbox"
@@ -85,7 +182,10 @@ export function ActionSwitch({
           onChange={(e) => {
             const next = e.target.checked;
             start(async () => {
-              const r = action === "pause" ? await setPaused(next) : await setIncognito(next);
+              const r =
+                action === "pause"
+                  ? await setPaused(next)
+                  : await setIncognito(next);
               if (r.ok) setOn(next);
               setMessage(r.message ?? null);
             });
@@ -93,17 +193,26 @@ export function ActionSwitch({
           className="mt-1 size-5 shrink-0 accent-clay disabled:opacity-50"
         />
       </label>
-      {message ? <p role="status" className="text-sm text-mocha">{message}</p> : null}
+      {message ? (
+        <p role="status" className="text-sm text-mocha">
+          {message}
+        </p>
+      ) : null}
     </div>
   );
 }
 
 export function DeleteAccountForm() {
-  const { state, pending, formProps } = useActionForm<FormState>(requestDeletion);
+  const { state, pending, formProps } =
+    useActionForm<FormState>(requestDeletion);
   const [open, setOpen] = useState(false);
   if (!open) {
     return (
-      <Button variant="secondary" onClick={() => setOpen(true)} className="self-start">
+      <Button
+        variant="secondary"
+        onClick={() => setOpen(true)}
+        className="self-start"
+      >
         Delete my account…
       </Button>
     );
@@ -111,16 +220,34 @@ export function DeleteAccountForm() {
   return (
     <form {...formProps} className="flex flex-col gap-4">
       <Notice tone="warning" title="Before you go">
-        Your profile disappears straight away and your matches end. Everything is permanently deleted after 30 days;
-        log back in before then if you change your mind. Some records are kept where the law requires.
+        Your profile disappears straight away and your matches end. Everything
+        is permanently deleted after 30 days; log back in before then if you
+        change your mind. Some records are kept where the law requires.
       </Notice>
-      {state.message ? <p role="alert" className="text-sm text-alert">{state.message}</p> : null}
-      <Field label="Type DELETE to confirm" htmlFor="confirm" error={state.errors?.confirm}>
-        <Input id="confirm" name="confirm" autoComplete="off" aria-invalid={state.errors?.confirm ? true : undefined} />
+      {state.message ? (
+        <p role="alert" className="text-sm text-alert">
+          {state.message}
+        </p>
+      ) : null}
+      <Field
+        label="Type DELETE to confirm"
+        htmlFor="confirm"
+        error={state.errors?.confirm}
+      >
+        <Input
+          id="confirm"
+          name="confirm"
+          autoComplete="off"
+          aria-invalid={state.errors?.confirm ? true : undefined}
+        />
       </Field>
       <div className="flex gap-3">
-        <Button type="submit" variant="destructive" disabled={pending}>{pending ? "Deleting…" : "Delete my account"}</Button>
-        <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+        <Button type="submit" variant="destructive" disabled={pending}>
+          {pending ? "Deleting…" : "Delete my account"}
+        </Button>
+        <Button variant="ghost" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
       </div>
     </form>
   );

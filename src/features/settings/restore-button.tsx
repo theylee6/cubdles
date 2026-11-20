@@ -20,7 +20,11 @@ export function RestoreButton() {
       >
         {pending ? "Restoring…" : "Changed your mind? Restore my account"}
       </Button>
-      {message ? <p role="alert" className="text-sm text-alert">{message}</p> : null}
+      {message ? (
+        <p role="alert" className="text-sm text-alert">
+          {message}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -6,7 +6,11 @@ import { Notice } from "@/components/ui/primitives";
 
 function Inner() {
   const saved = useSearchParams().get("saved");
-  return saved ? <Notice title="Saved" className="mb-6">Your changes are live.</Notice> : null;
+  return saved ? (
+    <Notice title="Saved" className="mb-6">
+      Your changes are live.
+    </Notice>
+  ) : null;
 }
 
 /** Shows a confirmation after an edit redirects back with ?saved=… */

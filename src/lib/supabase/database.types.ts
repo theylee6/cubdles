@@ -269,6 +269,27 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      notification_settings: {
+        Row: {
+          profile_id: string;
+          email_matches: boolean;
+          email_messages: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          profile_id: string;
+          email_matches?: boolean;
+          email_messages?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          profile_id?: string;
+          email_matches?: boolean;
+          email_messages?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       messages: {
         Row: {
           id: string;
@@ -825,6 +846,29 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      claim_notifications: {
+        Args: { p_limit?: number };
+        Returns: {
+          id: number;
+          kind: Database["public"]["Enums"]["notification_kind"];
+          profile_id: string;
+          email: string;
+          recipient_name: string | null;
+          other_name: string | null;
+          ref_id: string;
+          last_contact_at: string | null;
+          timezone: string | null;
+        }[];
+      };
+      complete_notification: {
+        Args: { p_id: number; p_ok: boolean; p_error?: string | null };
+        Returns: undefined;
+      };
+      notifications_due: { Args: never; Returns: boolean };
+      set_notification_settings: {
+        Args: { p_email_matches: boolean; p_email_messages: boolean };
+        Returns: undefined;
+      };
       rate_limit_hit: {
         Args: {
           p_bucket: string;
@@ -999,6 +1043,7 @@ export type Database = {
       };
     };
     Enums: {
+      notification_kind: "match" | "message" | "fraud_ban";
       report_reason:
         | "fake_profile"
         | "scam"

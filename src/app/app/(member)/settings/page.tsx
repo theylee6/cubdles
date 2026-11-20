@@ -10,6 +10,7 @@ import { PageHeader, PageSkeleton } from "@/features/member/page-header";
 import {
   ActionSwitch,
   DeleteAccountForm,
+  EmailSettingsForm,
   PrivacyForm,
 } from "@/features/settings/settings-forms";
 import { signOutAction } from "@/lib/auth/actions";
@@ -40,6 +41,11 @@ async function Settings() {
     supabase.from("profiles").select("is_incognito").eq("id", me.id).single(),
     getMyFeatures(),
   ]);
+  const { data: emailPrefs } = await supabase
+    .from("notification_settings")
+    .select("email_matches, email_messages")
+    .eq("profile_id", me.id)
+    .maybeSingle();
   const [advisory, staffRoles] = await Promise.all([
     getSafetyAdvisory(),
     getStaffRoles(),
@@ -83,6 +89,16 @@ async function Settings() {
             }
           />
         </div>
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 text-xl">Emails</h2>
+        <EmailSettingsForm
+          initial={{
+            email_matches: emailPrefs?.email_matches ?? true,
+            email_messages: emailPrefs?.email_messages ?? true,
+          }}
+        />
       </Card>
 
       <Card>
