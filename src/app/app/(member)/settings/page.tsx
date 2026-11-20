@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/primitives";
 import { getSafetyAdvisory } from "@/features/member/safety";
 import { SafetyAdvisoryNotice } from "@/features/member/safety-advisory";
 import { getStaffRoles } from "@/lib/auth/staff";
+import { CancelMembershipButton } from "@/features/billing/components/cancel-button";
+import { getMembership } from "@/features/billing/data";
+import { formatMoney } from "@/lib/utils";
 import { getMyFeatures } from "@/features/member/features";
 import { PageHeader, PageSkeleton } from "@/features/member/page-header";
 import {
@@ -46,10 +49,18 @@ async function Settings() {
     .select("email_matches, email_messages")
     .eq("profile_id", me.id)
     .maybeSingle();
-  const [advisory, staffRoles] = await Promise.all([
+  const [advisory, staffRoles, membership] = await Promise.all([
     getSafetyAdvisory(),
     getStaffRoles(),
+    getMembership(),
   ]);
+  const periodEnd = membership.subscription?.currentPeriodEnd
+    ? new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(membership.subscription.currentPeriodEnd))
+    : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -89,6 +100,43 @@ async function Settings() {
             }
           />
         </div>
+      </Card>
+
+      <Card className="flex flex-col gap-3">
+        <h2 className="text-xl">Membership</h2>
+        {membership.planCode === "plus" && membership.subscription ? (
+          <>
+            <p className="text-sm">
+              <strong>{membership.subscription.planName}</strong>
+              {membership.subscription.amountMinor !== null &&
+              membership.subscription.currency
+                ? ` · ${formatMoney(membership.subscription.amountMinor, membership.subscription.currency)} every ${membership.subscription.periodMonths === 1 ? "month" : `${membership.subscription.periodMonths} months`}`
+                : ""}
+            </p>
+            <p className="text-sm text-mocha">
+              {membership.subscription.cancelAtPeriodEnd ||
+              membership.subscription.status === "cancelled"
+                ? `Cancelled. You have Plus until ${periodEnd ?? "the end of this period"}.`
+                : membership.subscription.status === "pending"
+                  ? "Your last renewal payment didn't go through; Razorpay will retry. Please check your payment method."
+                  : `Renews${periodEnd ? ` on ${periodEnd}` : " automatically"}.`}
+            </p>
+            {!membership.subscription.cancelAtPeriodEnd &&
+            membership.subscription.status !== "cancelled" ? (
+              <CancelMembershipButton until={periodEnd} />
+            ) : null}
+          </>
+        ) : (
+          <p className="text-sm text-mocha">
+            You&rsquo;re on the free plan.{" "}
+            <Link
+              href="/app/upgrade"
+              className="text-clay underline underline-offset-4"
+            >
+              See Cubdles Plus
+            </Link>
+          </p>
+        )}
       </Card>
 
       <Card>

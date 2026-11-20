@@ -119,7 +119,7 @@ export function BrowseView({
             <Lock className="mr-1 inline size-3.5" aria-hidden />
             Cuddle style, pace and activity filters come with{" "}
             <Link
-              href="/pricing"
+              href="/app/upgrade"
               className="text-clay underline underline-offset-4"
             >
               Cubdles Plus

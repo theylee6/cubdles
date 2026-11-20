@@ -65,7 +65,7 @@ async function Likes() {
                 <Lock className="mr-1 inline size-3.5" aria-hidden />
                 Seeing who comes with{" "}
                 <Link
-                  href="/pricing"
+                  href="/app/upgrade"
                   className="text-clay underline underline-offset-4"
                 >
                   Cubdles Plus

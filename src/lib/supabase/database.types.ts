@@ -306,6 +306,30 @@ export type Database = {
         Update: never
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          id: string
+          profile_id: string
+          plan_id: string
+          price_id: string | null
+          provider: string
+          provider_subscription_id: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          current_period_end: string | null
+          cancel_at_period_end: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: never
+        Update: { status?: Database["public"]["Enums"]["subscription_status"]; current_period_end?: string | null; cancel_at_period_end?: boolean; updated_at?: string }
+        Relationships: []
+      }
+      payment_events: {
+        Row: { provider_event_id: string; provider: string; event_type: string; payload: Json; received_at: string }
+        Insert: { provider_event_id: string; provider?: string; event_type: string; payload: Json; received_at?: string }
+        Update: never
+        Relationships: []
+      }
       messages: {
         Row: {
           id: string;
@@ -863,6 +887,22 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      my_membership: { Args: never; Returns: Json }
+      upsert_subscription: {
+        Args: {
+          p_profile: string
+          p_price: string
+          p_provider_subscription_id: string
+          p_status: Database["public"]["Enums"]["subscription_status"]
+          p_current_period_end?: string | null
+          p_cancel_at_period_end?: boolean | null
+        }
+        Returns: string
+      }
+      update_subscription_status: {
+        Args: { p_provider_subscription_id: string; p_status: Database["public"]["Enums"]["subscription_status"]; p_current_period_end?: string | null }
+        Returns: boolean | null
+      }
       start_verification: {
         Args: never
         Returns: { id: string; profile_id: string; pose: string; storage_path: string | null; status: Database["public"]["Enums"]["verification_status"]; note: string | null; reviewed_by: string | null; reviewed_at: string | null; created_at: string }
@@ -1071,6 +1111,7 @@ export type Database = {
       };
     };
     Enums: {
+      subscription_status: "created" | "authenticated" | "active" | "pending" | "halted" | "cancelled" | "completed" | "expired"
       verification_status: "awaiting_photo" | "pending" | "approved" | "rejected"
       notification_kind: "match" | "message" | "fraud_ban";
       report_reason:

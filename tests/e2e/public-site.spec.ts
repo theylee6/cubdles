@@ -130,3 +130,14 @@ test("the admin area needs a login and malformed report ids 404", async ({ page 
   const bad = await page.goto("/admin/reports/not-an-id");
   expect(bad?.status()).toBe(404);
 });
+
+test("server endpoints reject forged calls", async ({ request }) => {
+  const webhook = await request.post("/api/webhooks/razorpay", { data: { event: "subscription.activated" }, headers: { "x-razorpay-signature": "forged" } });
+  expect(webhook.status()).toBe(401);
+  const dispatch = await request.post("/api/notifications/dispatch", { headers: { authorization: "Bearer wrong" } });
+  expect(dispatch.status()).toBe(401);
+  const unsub = await request.post("/api/unsubscribe?u=00000000-0000-0000-0000-000000000000&k=messages&t=forged");
+  expect(unsub.status()).toBe(400);
+  const exportData = await request.get("/api/me/export");
+  expect(exportData.status()).toBe(401);
+});

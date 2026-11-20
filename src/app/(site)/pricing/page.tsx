@@ -75,7 +75,8 @@ async function Plans() {
 }
 
 function PlanGrid({ plans }: { plans: Plan[] }) {
-  const featureKeys = Object.keys(FEATURE_LABELS).filter((k) => plans.some((p) => p.entitlements.some((e) => e.featureKey === k)));
+  // Only features that some plan actually includes (never list something nobody can get).
+  const featureKeys = Object.keys(FEATURE_LABELS).filter((k) => plans.some((p) => p.entitlements.some((e) => e.featureKey === k && e.limitValue !== 0)));
 
   return (
     <div className="grid gap-5 md:grid-cols-2">
@@ -136,8 +137,8 @@ function PlanGrid({ plans }: { plans: Plan[] }) {
               })}
             </ul>
 
-            <ButtonLink href="/join" variant={plan.isFree ? "secondary" : "primary"} className="mt-auto">
-              {plan.isFree ? "Join free" : `Join, then upgrade`}
+            <ButtonLink href={plan.isFree ? "/join" : "/app/upgrade"} variant={plan.isFree ? "secondary" : "primary"} className="mt-auto">
+              {plan.isFree ? "Join free" : plan.prices.length ? "Get Plus" : "Join free for now"}
             </ButtonLink>
           </Card>
         );
