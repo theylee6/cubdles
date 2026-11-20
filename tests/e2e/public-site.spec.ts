@@ -123,3 +123,10 @@ test("chat links are protected: malformed ids 404, real ones need a login", asyn
   await page.goto("/app/matches/00000000-0000-0000-0000-000000000000");
   await expect(page.getByText(/welcome back|accounts aren't connected yet/i).first()).toBeVisible();
 });
+
+test("the admin area needs a login and malformed report ids 404", async ({ page }) => {
+  await page.goto("/admin");
+  await expect(page.getByText(/welcome back|accounts aren't connected yet/i).first()).toBeVisible();
+  const bad = await page.goto("/admin/reports/not-an-id");
+  expect(bad?.status()).toBe(404);
+});

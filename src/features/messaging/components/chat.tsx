@@ -16,6 +16,7 @@ import {
 import { ArrowLeft, Ban, HeartOff, SendHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { blockAction, unmatchAction } from "@/features/discovery/actions";
+import { ReportButton } from "@/features/safety/components/report-dialog";
 import { isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -399,6 +400,17 @@ export function Chat({
           <Ban className="size-4" aria-hidden />
           <span className="hidden sm:inline">Block</span>
         </Button>
+        {live ? (
+          <ReportButton
+            reportedId={other.id}
+            name={other.name}
+            matchId={matchId}
+            afterBlockHref="/app/matches"
+            triggerVariant="ghost"
+            triggerSize="sm"
+            compact
+          />
+        ) : null}
       </header>
 
       <div

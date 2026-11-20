@@ -90,6 +90,15 @@ Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `l
 | `my_conversations()`, `unread_conversations_count()` | Conversation list and nav badge |
 | `private.in_active_match`, `private.shares_read_receipts` | Policy helpers |
 
+## Migration 9 — safety (2026-11-20)
+
+| Object | Purpose |
+| --- | --- |
+| `reports` | Member reports (reason, details, priority, status, decision); reporters see their own, moderators all |
+| `safety_notices` | In-app notices: `warning`, `fraud_ban` (15 U.S.C. 45g) |
+| `create_report()`, `dismiss_safety_notice()`, `my_staff_roles()` | Member-facing |
+| `staff_queue_counts`, `staff_pending_photos`, `staff_moderate_photo`, `staff_list_reports`, `staff_report_detail`, `staff_resolve_report` | Moderator-only, audited |
+
 ## Coming in later migrations
 
 Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

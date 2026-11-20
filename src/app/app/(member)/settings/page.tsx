@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/primitives";
 import { getSafetyAdvisory } from "@/features/member/safety";
 import { SafetyAdvisoryNotice } from "@/features/member/safety-advisory";
+import { getStaffRoles } from "@/lib/auth/staff";
 import { getMyFeatures } from "@/features/member/features";
 import { PageHeader, PageSkeleton } from "@/features/member/page-header";
 import {
@@ -39,11 +40,20 @@ async function Settings() {
     supabase.from("profiles").select("is_incognito").eq("id", me.id).single(),
     getMyFeatures(),
   ]);
-  const advisory = await getSafetyAdvisory();
+  const [advisory, staffRoles] = await Promise.all([getSafetyAdvisory(), getStaffRoles()]);
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Settings" />
+      <PageHeader
+        title="Settings"
+        actions={
+          staffRoles.length ? (
+            <Link href="/admin" className="text-sm text-clay underline underline-offset-4">
+              Moderation tools
+            </Link>
+          ) : undefined
+        }
+      />
       <SafetyAdvisoryNotice advisory={advisory} />
 
       <Card>

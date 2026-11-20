@@ -7,7 +7,7 @@ import { isEditSection } from "@/features/settings/sections";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Paths that require a signed-in user. Real authorisation still happens on the server and in RLS. */
-const PROTECTED_PREFIXES = ["/app", "/onboarding"];
+const PROTECTED_PREFIXES = ["/app", "/onboarding", "/admin"];
 
 /**
  * Refreshes the Supabase session cookie on every request and does an optimistic
@@ -17,7 +17,7 @@ export async function proxy(request: NextRequest) {
   // Unknown onboarding steps are a hard 404 (Cache Components streams pages, so the page itself can't set the status).
   const stepMatch = request.nextUrl.pathname.match(/^\/onboarding\/([^/]+)\/?$/);
   const editMatch = request.nextUrl.pathname.match(/^\/app\/me\/edit\/([^/]+)\/?$/);
-  const idMatch = request.nextUrl.pathname.match(/^\/app\/(?:matches|profile)\/([^/]+)\/?$/);
+  const idMatch = request.nextUrl.pathname.match(/^\/(?:app\/matches|app\/profile|admin\/reports)\/([^/]+)\/?$/);
   if (
     (stepMatch && !isStepSlug(decodeURIComponent(stepMatch[1]))) ||
     (editMatch && !isEditSection(decodeURIComponent(editMatch[1]))) ||

@@ -177,6 +177,43 @@ export type Database = {
         Update: { created_at?: string; from_id?: string; to_id?: string }
         Relationships: []
       }
+      reports: {
+        Row: {
+          id: string
+          reporter_id: string | null
+          reported_id: string | null
+          match_id: string | null
+          message_id: string | null
+          reason: Database["public"]["Enums"]["report_reason"]
+          details: string | null
+          priority: Database["public"]["Enums"]["report_priority"]
+          status: Database["public"]["Enums"]["report_status"]
+          action: string | null
+          resolution: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      safety_notices: {
+        Row: {
+          id: string
+          profile_id: string
+          kind: Database["public"]["Enums"]["safety_notice_kind"]
+          subject_id: string | null
+          subject_name: string | null
+          last_contact_at: string | null
+          reason: Database["public"]["Enums"]["report_reason"] | null
+          created_at: string
+          dismissed_at: string | null
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       messages: {
         Row: { id: string; match_id: string; sender_id: string; body: string; client_id: string; created_at: string }
         Insert: never
@@ -668,6 +705,51 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_report: {
+        Args: {
+          p_reported: string
+          p_reason: Database["public"]["Enums"]["report_reason"]
+          p_details?: string | null
+          p_match_id?: string | null
+          p_message_id?: string | null
+          p_block?: boolean
+        }
+        Returns: string
+      }
+      dismiss_safety_notice: { Args: { p_id: string }; Returns: undefined }
+      my_staff_roles: { Args: never; Returns: string[] }
+      staff_queue_counts: { Args: never; Returns: Json }
+      staff_pending_photos: {
+        Args: { p_limit?: number }
+        Returns: {
+          photo_id: string
+          profile_id: string
+          storage_path: string
+          display_name: string | null
+          profile_status: Database["public"]["Enums"]["profile_status"]
+          uploaded_at: string
+        }[]
+      }
+      staff_moderate_photo: { Args: { p_photo: string; p_approve: boolean; p_note?: string | null }; Returns: undefined }
+      staff_list_reports: {
+        Args: { p_status?: Database["public"]["Enums"]["report_status"]; p_limit?: number }
+        Returns: {
+          report_id: string
+          reason: Database["public"]["Enums"]["report_reason"]
+          priority: Database["public"]["Enums"]["report_priority"]
+          status: Database["public"]["Enums"]["report_status"]
+          details: string | null
+          created_at: string
+          reported_id: string | null
+          reported_name: string | null
+          reported_status: Database["public"]["Enums"]["profile_status"] | null
+          reporter_id: string | null
+          reporter_name: string | null
+          reports_against: number
+        }[]
+      }
+      staff_report_detail: { Args: { p_report: string }; Returns: Json }
+      staff_resolve_report: { Args: { p_report: string; p_action: string; p_note: string; p_fraud?: boolean }; Returns: Json }
       send_message: {
         Args: { p_match_id: string; p_body: string; p_client_id: string }
         Returns: { id: string; match_id: string; sender_id: string; body: string; client_id: string; created_at: string }
@@ -743,6 +825,10 @@ export type Database = {
       }
     }
     Enums: {
+      report_reason: "fake_profile" | "scam" | "harassment" | "inappropriate_content" | "hate" | "underage" | "offline_safety" | "spam" | "other"
+      report_status: "open" | "actioned" | "dismissed"
+      report_priority: "normal" | "urgent"
+      safety_notice_kind: "warning" | "fraud_ban"
       affection_pace: "slow" | "steady" | "quick"
       cuddle_style: "big_spoon" | "little_spoon" | "either" | "not_sure"
       like_kind: "like" | "super"

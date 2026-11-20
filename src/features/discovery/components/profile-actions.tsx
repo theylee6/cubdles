@@ -6,6 +6,7 @@ import { Ban, Heart, HeartOff, MessageCircle, Star, X } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { blockAction, swipeAction, unmatchAction } from "../actions";
 import type { ProfileCard } from "../types";
+import { ReportButton } from "@/features/safety/components/report-dialog";
 import { MatchDialog } from "./match-dialog";
 
 /** Actions on a full profile page: like / pass for new people, unmatch for matches, block for anyone. */
@@ -102,15 +103,18 @@ export function ProfileActions({ card }: { card: ProfileCard }) {
           </Button>
         </div>
       )}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={block}
-        disabled={pending}
-        className="self-center text-mocha"
-      >
-        <Ban className="size-4" aria-hidden /> Block {card.display_name}
-      </Button>
+      <div className="flex items-center justify-center gap-2 text-mocha">
+        <Button variant="ghost" size="sm" onClick={block} disabled={pending}>
+          <Ban className="size-4" aria-hidden /> Block
+        </Button>
+        <ReportButton
+          reportedId={card.id}
+          name={card.display_name ?? "this member"}
+          matchId={card.match_id ?? undefined}
+          triggerVariant="ghost"
+          triggerSize="sm"
+        />
+      </div>
       <MatchDialog
         card={matchCard}
         onClose={() => {

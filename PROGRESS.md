@@ -1,12 +1,12 @@
 # Cubdles — development progress
 
-Last updated: 2026-11-20 (M4 messaging; production live at https://cubdles.com).
+Last updated: 2026-11-20 (M5 safety; production live at https://cubdles.com).
 
 **Decision (18 Nov): Cubdles launches worldwide.** See plan section 2b. Owner decisions: English first (i18n-ready), UK selfie age estimation, no extra country blocks plus safety advisories, company based in India, Razorpay primary (Stripe India is invite-only) with Stripe as a fallback.
 
 ## Supabase project
 
-- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–8 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–9 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
 - Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
 - Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
 - Auth configured: Site URL https://cubdles.com, redirect URLs, custom SMTP via Resend (sender no-reply@cubdles.com, domain cubdles.com verified), email limit 100/h. Still to do: Google/Apple providers.
@@ -22,7 +22,8 @@ Last updated: 2026-11-20 (M4 messaging; production live at https://cubdles.com).
 | M3 Discovery + matching | **Done** — discovery (swipe + browse + filters), daily picks, transparent compatibility score, likes/super likes/passes with quotas, race-safe mutual matching, liked-you count (list is premium), matches, unmatch, block, profile pages |
 | M2 extras | **Done** — profile editing (same step forms in edit mode), privacy settings, pause, incognito (premium-gated), account deletion with 30-day restore + daily purge job |
 | M4 Messaging | **Done** — conversations on match, real-time delivery (with polling fallback), optimistic sending with retry, read receipts (mutual, respects privacy), unread badge, unmatch/block from chat, flood limits. Email/push notifications and reporting from chat move to M5 |
-| M5–M8 | Not started (next: M5 safety: reporting, moderation queue, admin; message notifications) |
+| M5 Safety | **Done (core)** — report from profiles and chats (with optional block, urgent triage for under-18/offline safety), photo moderation queue, reports queue with conversation context, warn/suspend/ban with audit log, in-app fraud-ban notices (15 U.S.C. 45g) and warnings. Email notifications need a Resend API key (next) |
+| M6–M8 | Not started (M6 subscriptions & payments, M7 verification & age assurance, M8 hardening & launch) |
 
 ## Completed
 
@@ -34,7 +35,7 @@ Last updated: 2026-11-20 (M4 messaging; production live at https://cubdles.com).
 - SEO: metadata per page, sitemap, robots, web manifest, icon.
 - Auth: email+password sign-up (server-validated, 18+ and terms confirmation), login, Google/Apple OAuth, email confirm + recovery routes, password reset, sign-out, session refresh in `proxy.ts`, protected `/app`.
 - Database migration 1 with RLS on every table, column-level grants, storage bucket policies, age-gate (under-18 suspended + email blocked), location rounding, onboarding completion checks, audited staff status changes.
-- Tests: 84 unit, 206 database permission/behaviour, 52 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
+- Tests: 89 unit, 239 database permission/behaviour, 54 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
 
 ## Profile set-up (onboarding) — how it works
 
@@ -80,9 +81,19 @@ Last updated: 2026-11-20 (M4 messaging; production live at https://cubdles.com).
 - `my_conversations()` powers the list (preview, unread count); `unread_conversations_count()` the nav badge.
 - UI: `/app/matches` (conversation list, refreshes live), `/app/matches/[matchId]` (chat). Dev preview: `/dev/messages`.
 
+## Safety and moderation (migration 9) — how it works
+
+- Members report via `create_report()` only (no direct inserts): they must have actually come across the person; 10 reports/day; "other" needs details; under-18 and offline-safety reports are `urgent`. "Also block" is on by default.
+- Staff access is by `staff_roles` (`moderator` or `admin`). The admin area (`/admin`) 404s for everyone else and every staff function re-checks the role in the database.
+- `/admin/photos`: approve or reject pending photos (rejection reason is shown to the member). Members only appear in Discover once a photo is approved.
+- `/admin/reports`: urgent first; detail shows the reported member, their photos, report history and the last 100 messages between the two people (opening a report is audit-logged).
+- Decisions: dismiss / warn (member sees a warning notice) / suspend / ban (audited through `staff_set_profile_status`; closes their other open reports). A **fraud ban** immediately creates the fraud-ban notice for everyone who received a message from the banned member, with the banned member's name, last contact time, the false-identity and don't-send-money statements, fraud-avoidance links and how to contact us (15 U.S.C. 45g requires delivery within 24 hours).
+- Notices appear at the top of every member page until dismissed.
+- **Granting staff access** is an owner action (SQL editor): `insert into public.staff_roles (user_id, role) select id, 'admin' from auth.users where email = '…';`
+
 ## Pending (next up)
 
-1. M5: reporting (profiles and messages), moderation queue, admin; email notifications for new messages and matches.
+1. Email notifications (new match, new message after a quiet period, fraud-ban notice by email too) via Resend API (owner adds `RESEND_API_KEY`).
 2. Photo moderation: automated scan provider + moderator queue (M5). Until then photos stay `pending` and need approving in the database.
 3. Phone OTP (global SMS provider, e.g. Twilio Verify).
 4. Rate limiting (Upstash) on sign-up, login, contact form and uploads.
@@ -100,7 +111,8 @@ Last updated: 2026-11-20 (M4 messaging; production live at https://cubdles.com).
 - Photos use plain `<img>` with signed URLs; switch to an image CDN / `next/image` loader in M8.
 - Discovery scores every eligible candidate per request. Fine for launch-city scale; at larger scale, precompute scores (materialised candidate table refreshed by a job).
 - Swipe deck re-queries from offset 0 when it runs low (offsets shift as people are liked/passed); browse uses offsets and may show a person twice after acting on them.
-- Reporting a profile isn't built yet (M5); blocking is available everywhere.
+- Fraud-ban notices are in-app only until email notifications ship; members who stopped opening the app won't see them yet.
+- No automated photo scanning yet: every photo is reviewed by a person. Add an image-moderation provider before volume grows.
 - UK: highly effective age assurance for UK members is needed before UK launch (decision G2, verification provider in M7).
 - India-based company: EU/UK representatives, EU OSS and UK VAT registration, GST LUT for exports, Razorpay international + subscriptions activation, legal review — owner actions.
 - English only; strings are not yet extracted for translation (G1).
