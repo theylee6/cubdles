@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/primitives";
 import { getSafetyAdvisory } from "@/features/member/safety";
 import { SafetyAdvisoryNotice } from "@/features/member/safety-advisory";
@@ -40,7 +40,10 @@ async function Settings() {
     supabase.from("profiles").select("is_incognito").eq("id", me.id).single(),
     getMyFeatures(),
   ]);
-  const [advisory, staffRoles] = await Promise.all([getSafetyAdvisory(), getStaffRoles()]);
+  const [advisory, staffRoles] = await Promise.all([
+    getSafetyAdvisory(),
+    getStaffRoles(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -48,7 +51,10 @@ async function Settings() {
         title="Settings"
         actions={
           staffRoles.length ? (
-            <Link href="/admin" className="text-sm text-clay underline underline-offset-4">
+            <Link
+              href="/admin"
+              className="text-sm text-clay underline underline-offset-4"
+            >
               Moderation tools
             </Link>
           ) : undefined
@@ -96,11 +102,24 @@ async function Settings() {
           </Link>
           .
         </p>
-        <form action={signOutAction}>
-          <Button type="submit" variant="secondary">
-            Log out
-          </Button>
-        </form>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="/api/me/export"
+            download
+            className={buttonClasses("secondary")}
+          >
+            Download my data
+          </a>
+          <form action={signOutAction}>
+            <Button type="submit" variant="secondary">
+              Log out
+            </Button>
+          </form>
+        </div>
+        <p className="text-xs text-mocha">
+          Your data download is a JSON file with your profile, matches, messages
+          you sent, reports you made and settings.
+        </p>
       </Card>
 
       <Card className="flex flex-col gap-3">

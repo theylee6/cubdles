@@ -6,7 +6,8 @@ import { ContactForm } from "./contact-form";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with the Cubdles team about safety, membership, privacy or anything else.",
+  description:
+    "Get in touch with the Cubdles team about safety, membership, privacy or anything else.",
 };
 
 export default function ContactPage() {
@@ -24,8 +25,10 @@ export default function ContactPage() {
         <div className="flex flex-col items-center gap-4 text-center lg:items-start lg:text-left">
           <EnvelopeIllustration className="w-40" />
           <p className="text-mocha">
-            Reporting someone on Cubdles? The fastest way is the <strong className="text-cocoa">Report</strong> option on their profile or in your chat —
-            it attaches the details our moderators need.
+            Reporting someone on Cubdles? The fastest way is the{" "}
+            <strong className="text-cocoa">Report</strong> option on their
+            profile or in your chat — it attaches the details our moderators
+            need.
           </p>
         </div>
       </Container>

@@ -21,13 +21,18 @@ export async function GET(request: NextRequest) {
     .lt("deletion_requested_at", cutoff)
     .eq("profiles.status", "deleted")
     .limit(100);
-  if (error) return NextResponse.json({ error: "query_failed" }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: "query_failed" }, { status: 500 });
 
   const results: { id: string; ok: boolean; step?: string }[] = [];
   for (const { profile_id: id } of due ?? []) {
-    const { data: files } = await admin.storage.from("profile-photos").list(id, { limit: 1000 });
+    const { data: files } = await admin.storage
+      .from("profile-photos")
+      .list(id, { limit: 1000 });
     if (files?.length) {
-      const { error: rmError } = await admin.storage.from("profile-photos").remove(files.map((f) => `${id}/${f.name}`));
+      const { error: rmError } = await admin.storage
+        .from("profile-photos")
+        .remove(files.map((f) => `${id}/${f.name}`));
       if (rmError) {
         results.push({ id, ok: false, step: "storage" });
         continue;
@@ -39,5 +44,8 @@ export async function GET(request: NextRequest) {
 
   const failed = results.filter((r) => !r.ok).length;
   console.info("purge-accounts", { purged: results.length - failed, failed });
-  return NextResponse.json({ purged: results.length - failed, failed }, { status: failed ? 207 : 200 });
+  return NextResponse.json(
+    { purged: results.length - failed, failed },
+    { status: failed ? 207 : 200 },
+  );
 }

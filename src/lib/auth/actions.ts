@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { isSupabaseConfigured, publicEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
+import { LIMITS, allow, clientIp } from "@/lib/rate-limit";
 import { safeNextPath } from "@/lib/utils";
 import {
   type FormState,
@@ -14,9 +15,15 @@ import {
   signUpSchema,
 } from "./schemas";
 
+const TOO_MANY: FormState = {
+  ok: false,
+  message: "Too many attempts. Please wait a few minutes and try again.",
+};
+
 const NOT_CONFIGURED: FormState = {
   ok: false,
-  message: "Accounts aren't switched on yet: this site isn't connected to its database. Please try again later.",
+  message:
+    "Accounts aren't switched on yet: this site isn't connected to its database. Please try again later.",
 };
 
 async function siteOrigin(): Promise<string> {
@@ -26,13 +33,21 @@ async function siteOrigin(): Promise<string> {
   return host ? `${proto}://${host}` : publicEnv.NEXT_PUBLIC_SITE_URL;
 }
 
-export async function signUpAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function signUpAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const raw = Object.fromEntries(formData) as Record<string, string>;
   const parsed = signUpSchema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false, errors: fieldErrors(parsed.error), values: { email: raw.email ?? "" } };
+    return {
+      ok: false,
+      errors: fieldErrors(parsed.error),
+      values: { email: raw.email ?? "" },
+    };
   }
   if (!isSupabaseConfigured()) return NOT_CONFIGURED;
+  if (!(await allow(LIMITS.signUpIp, await clientIp()))) return TOO_MANY;
 
   const supabase = await createClient();
   const origin = await siteOrigin();
@@ -45,13 +60,23 @@ export async function signUpAction(_prev: FormState, formData: FormData): Promis
   if (error) {
     // Don't reveal whether an email is already registered.
     if (error.code === "weak_password") {
-      return { ok: false, errors: { password: error.message }, values: { email: parsed.data.email } };
+      return {
+        ok: false,
+        errors: { password: error.message },
+        values: { email: parsed.data.email },
+      };
     }
     if (error.status === 429) {
-      return { ok: false, message: "Too many attempts. Please wait a minute and try again." };
+      return {
+        ok: false,
+        message: "Too many attempts. Please wait a minute and try again.",
+      };
     }
     console.error("signUp failed", error.code, error.status);
-    return { ok: false, message: "We couldn't create your account just now. Please try again." };
+    return {
+      ok: false,
+      message: "We couldn't create your account just now. Please try again.",
+    };
   }
 
   return {
@@ -60,24 +85,49 @@ export async function signUpAction(_prev: FormState, formData: FormData): Promis
   };
 }
 
-export async function signInAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function signInAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const raw = Object.fromEntries(formData) as Record<string, string>;
   const parsed = signInSchema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false, errors: fieldErrors(parsed.error), values: { email: raw.email ?? "" } };
+    return {
+      ok: false,
+      errors: fieldErrors(parsed.error),
+      values: { email: raw.email ?? "" },
+    };
   }
   if (!isSupabaseConfigured()) return NOT_CONFIGURED;
+  const [ipOk, emailOk] = await Promise.all([
+    allow(LIMITS.signInIp, await clientIp()),
+    allow(LIMITS.signInEmail, parsed.data.email),
+  ]);
+  if (!ipOk || !emailOk)
+    return { ...TOO_MANY, values: { email: parsed.data.email } };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     if (error.code === "email_not_confirmed") {
-      return { ok: false, message: "Please confirm your email first — check your inbox for our link.", values: { email: parsed.data.email } };
+      return {
+        ok: false,
+        message:
+          "Please confirm your email first — check your inbox for our link.",
+        values: { email: parsed.data.email },
+      };
     }
     if (error.status === 429) {
-      return { ok: false, message: "Too many attempts. Please wait a minute and try again." };
+      return {
+        ok: false,
+        message: "Too many attempts. Please wait a minute and try again.",
+      };
     }
-    return { ok: false, message: "That email and password don't match.", values: { email: parsed.data.email } };
+    return {
+      ok: false,
+      message: "That email and password don't match.",
+      values: { email: parsed.data.email },
+    };
   }
 
   redirect(safeNextPath(raw.next));
@@ -85,7 +135,10 @@ export async function signInAction(_prev: FormState, formData: FormData): Promis
 
 export async function oauthAction(formData: FormData): Promise<void> {
   const provider = formData.get("provider");
-  if (provider !== "google" && provider !== "apple") redirect("/login?error=provider");
+  if (provider !== "google" && provider !== "apple")
+    redirect("/login?error=provider");
+  if (!publicEnv.NEXT_PUBLIC_AUTH_PROVIDERS.includes(provider))
+    redirect(`/login?error=${provider}_unavailable`);
   if (!isSupabaseConfigured()) redirect("/login?error=not_configured");
 
   const supabase = await createClient();
@@ -93,16 +146,22 @@ export async function oauthAction(formData: FormData): Promise<void> {
   const next = safeNextPath(formData.get("next"));
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
-    options: { redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
+    options: {
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+    },
   });
   if (error || !data.url) redirect(`/login?error=${provider}_unavailable`);
   redirect(data.url);
 }
 
-export async function requestPasswordResetAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function requestPasswordResetAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const parsed = resetRequestSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error) };
   if (!isSupabaseConfigured()) return NOT_CONFIGURED;
+  if (!(await allow(LIMITS.resetIp, await clientIp()))) return TOO_MANY;
 
   const supabase = await createClient();
   const origin = await siteOrigin();
@@ -110,10 +169,16 @@ export async function requestPasswordResetAction(_prev: FormState, formData: For
     redirectTo: `${origin}/auth/confirm?next=/reset-password/new`,
   });
   // Same answer whether or not the account exists.
-  return { ok: true, message: "If that email has an account, a reset link is on its way." };
+  return {
+    ok: true,
+    message: "If that email has an account, a reset link is on its way.",
+  };
 }
 
-export async function updatePasswordAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function updatePasswordAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const parsed = newPasswordSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error) };
   if (!isSupabaseConfigured()) return NOT_CONFIGURED;
@@ -121,10 +186,22 @@ export async function updatePasswordAction(_prev: FormState, formData: FormData)
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims?.sub) {
-    return { ok: false, message: "Your reset link has expired. Please request a new one." };
+    return {
+      ok: false,
+      message: "Your reset link has expired. Please request a new one.",
+    };
   }
-  const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
-  if (error) return { ok: false, message: error.code === "same_password" ? "Please choose a new password." : "We couldn't update your password. Please try again." };
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+  if (error)
+    return {
+      ok: false,
+      message:
+        error.code === "same_password"
+          ? "Please choose a new password."
+          : "We couldn't update your password. Please try again.",
+    };
   redirect("/app");
 }
 

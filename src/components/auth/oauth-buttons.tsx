@@ -1,10 +1,14 @@
 import { oauthAction } from "@/lib/auth/actions";
 import { buttonClasses } from "@/components/ui/button";
+import { publicEnv } from "@/lib/env";
 
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
-      <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.2.8 3.9 1.5l2.7-2.6C16.9 3.2 14.7 2.2 12 2.2 6.6 2.2 2.2 6.6 2.2 12S6.6 21.8 12 21.8c5.7 0 9.4-4 9.4-9.6 0-.6-.1-1.1-.2-1.6H12z" />
+      <path
+        fill="#EA4335"
+        d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.2.8 3.9 1.5l2.7-2.6C16.9 3.2 14.7 2.2 12 2.2 6.6 2.2 2.2 6.6 2.2 12S6.6 21.8 12 21.8c5.7 0 9.4-4 9.4-9.6 0-.6-.1-1.1-.2-1.6H12z"
+      />
     </svg>
   );
 }
@@ -17,30 +21,54 @@ function AppleIcon() {
   );
 }
 
-export function OAuthButtons({ next, verb }: { next?: string; verb: "Continue" | "Sign up" }) {
+/** Only providers switched on (NEXT_PUBLIC_AUTH_PROVIDERS) are shown — never a button that can't work. */
+export function OAuthButtons({
+  next,
+  verb,
+}: {
+  next?: string;
+  verb: "Continue" | "Sign up";
+}) {
+  const providers = publicEnv.NEXT_PUBLIC_AUTH_PROVIDERS;
+  if (!providers.length) return null;
   return (
     <div className="grid gap-3">
-      <form action={oauthAction}>
-        <input type="hidden" name="provider" value="google" />
-        <input type="hidden" name="next" value={next ?? "/app"} />
-        <button type="submit" className={buttonClasses("secondary", "md", "w-full")}>
-          <GoogleIcon /> {verb} with Google
-        </button>
-      </form>
-      <form action={oauthAction}>
-        <input type="hidden" name="provider" value="apple" />
-        <input type="hidden" name="next" value={next ?? "/app"} />
-        <button type="submit" className={buttonClasses("secondary", "md", "w-full")}>
-          <AppleIcon /> {verb} with Apple
-        </button>
-      </form>
+      {providers.includes("google") ? (
+        <form action={oauthAction}>
+          <input type="hidden" name="provider" value="google" />
+          <input type="hidden" name="next" value={next ?? "/app"} />
+          <button
+            type="submit"
+            className={buttonClasses("secondary", "md", "w-full")}
+          >
+            <GoogleIcon /> {verb} with Google
+          </button>
+        </form>
+      ) : null}
+      {providers.includes("apple") ? (
+        <form action={oauthAction}>
+          <input type="hidden" name="provider" value="apple" />
+          <input type="hidden" name="next" value={next ?? "/app"} />
+          <button
+            type="submit"
+            className={buttonClasses("secondary", "md", "w-full")}
+          >
+            <AppleIcon /> {verb} with Apple
+          </button>
+        </form>
+      ) : null}
     </div>
   );
 }
 
 export function OrDivider() {
+  if (!publicEnv.NEXT_PUBLIC_AUTH_PROVIDERS.length) return null;
   return (
-    <div className="flex items-center gap-3 text-sm text-mocha" role="separator" aria-label="or">
+    <div
+      className="flex items-center gap-3 text-sm text-mocha"
+      role="separator"
+      aria-label="or"
+    >
       <span className="h-px flex-1 bg-oat" />
       or
       <span className="h-px flex-1 bg-oat" />

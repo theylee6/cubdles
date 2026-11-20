@@ -52,11 +52,21 @@ function publishableKey(): string | undefined {
   return v;
 }
 
+/** Social sign-in providers switched on in Supabase (comma-separated, e.g. "google,apple"). Hidden otherwise. */
+function authProviders(): ("google" | "apple")[] {
+  const raw = cleanValue(process.env.NEXT_PUBLIC_AUTH_PROVIDERS) ?? "";
+  return raw
+    .split(",")
+    .map((p) => p.trim().toLowerCase())
+    .filter((p): p is "google" | "apple" => p === "google" || p === "apple");
+}
+
 export const publicEnv = {
   NEXT_PUBLIC_SITE_URL: siteUrl(),
   NEXT_PUBLIC_SUPABASE_URL: supabaseUrl(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishableKey(),
   NEXT_PUBLIC_SUPPORT_EMAIL: supportEmail(),
+  NEXT_PUBLIC_AUTH_PROVIDERS: authProviders(),
 } as const;
 
 /** True only when Supabase has been configured. Features that need it say so instead of pretending. */
