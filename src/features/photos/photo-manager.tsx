@@ -153,7 +153,7 @@ export function PhotoManager({ initialPhotos, onChange }: { initialPhotos: OwnPh
       />
       <p className="text-sm text-mocha">
         Clear photos of you, on your own in at least one. No nudity, other people&rsquo;s children, or contact details. We
-        remove location data from every photo.
+        remove location data from every photo. If you&rsquo;re verified, adding a photo removes the badge until you verify again.
       </p>
     </div>
   );

@@ -26,26 +26,38 @@ export async function GET(request: NextRequest) {
 
   const results: { id: string; ok: boolean; step?: string }[] = [];
   for (const { profile_id: id } of due ?? []) {
-    const { data: files } = await admin.storage
-      .from("profile-photos")
-      .list(id, { limit: 1000 });
-    if (files?.length) {
-      const { error: rmError } = await admin.storage
-        .from("profile-photos")
-        .remove(files.map((f) => `${id}/${f.name}`));
-      if (rmError) {
-        results.push({ id, ok: false, step: "storage" });
-        continue;
+    let storageOk = true;
+    for (const bucket of ["profile-photos", "verification-selfies"]) {
+      const { data: files } = await admin.storage.from(bucket).list(id, { limit: 1000 });
+      if (files?.length) {
+        const { error: rmError } = await admin.storage.from(bucket).remove(files.map((f) => `${id}/${f.name}`));
+        if (rmError) storageOk = false;
       }
+    }
+    if (!storageOk) {
+      results.push({ id, ok: false, step: "storage" });
+      continue;
     }
     const { error: delError } = await admin.auth.admin.deleteUser(id);
     results.push(delError ? { id, ok: false, step: "auth" } : { id, ok: true });
   }
 
+  // Daily sweep of files nothing points at any more (failed deletes, abandoned selfies).
+  let swept = 0;
+  const { data: orphans, error: orphanError } = await admin.rpc("orphaned_storage_files", { p_limit: 500 });
+  if (orphanError) console.error("orphan listing failed", orphanError.code);
+  for (const bucket of ["profile-photos", "verification-selfies"]) {
+    const paths = (orphans ?? []).filter((o) => o.bucket === bucket).map((o) => o.path);
+    if (!paths.length) continue;
+    const { error: sweepError } = await admin.storage.from(bucket).remove(paths);
+    if (sweepError) console.error("orphan sweep failed", bucket, sweepError.message);
+    else swept += paths.length;
+  }
+
   const failed = results.filter((r) => !r.ok).length;
-  console.info("purge-accounts", { purged: results.length - failed, failed });
+  console.info("purge-accounts", { purged: results.length - failed, failed, swept });
   return NextResponse.json(
-    { purged: results.length - failed, failed },
+    { purged: results.length - failed, failed, swept },
     { status: failed ? 207 : 200 },
   );
 }

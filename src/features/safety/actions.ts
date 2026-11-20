@@ -54,8 +54,8 @@ export async function reportAction(
   const { error } = await supabase.rpc("create_report", {
     p_reported: reportedId,
     p_reason: reason as (typeof REPORT_REASONS)[number]["value"],
-    p_details: details || null,
-    p_match_id: matchId ?? null,
+    p_details: details || undefined,
+    p_match_id: matchId ?? undefined,
     p_block: block,
   });
   if (error) {

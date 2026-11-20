@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       {
         p_provider_subscription_id: sub.id,
         p_status: mapStatus(sub.status),
-        p_current_period_end: toIso(sub.current_end),
+        p_current_period_end: toIso(sub.current_end) ?? undefined,
       },
     );
     if (error) {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         p_price: sub.notes.price_id,
         p_provider_subscription_id: sub.id,
         p_status: mapStatus(sub.status),
-        p_current_period_end: toIso(sub.current_end),
+        p_current_period_end: toIso(sub.current_end) ?? undefined,
       });
     }
   }

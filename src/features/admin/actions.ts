@@ -30,7 +30,7 @@ export async function moderatePhotoAction(
   const { error } = await supabase.rpc("staff_moderate_photo", {
     p_photo: photoId,
     p_approve: approve,
-    p_note: note ?? null,
+    p_note: note ?? undefined,
   });
   if (error) return { ok: false, message: staffError(error.message) };
   revalidatePath("/admin", "layout");
@@ -88,7 +88,7 @@ export async function decideVerificationAction(
   const supabase = await createClient();
   const { data: path, error } = await supabase.rpc(
     "staff_decide_verification",
-    { p_request: requestId, p_approve: approve, p_note: note ?? null },
+    { p_request: requestId, p_approve: approve, p_note: note ?? undefined },
   );
   if (error) return { ok: false, message: staffError(error.message) };
   // The selfie is only needed for this decision: delete it now.

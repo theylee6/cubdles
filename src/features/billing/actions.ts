@@ -117,7 +117,7 @@ export async function confirmCheckoutAction(
     await service.rpc("update_subscription_status", {
       p_provider_subscription_id: subId,
       p_status: mapStatus(sub.status),
-      p_current_period_end: toIso(sub.current_end),
+      p_current_period_end: toIso(sub.current_end) ?? undefined,
     });
   } catch (e) {
     console.error(

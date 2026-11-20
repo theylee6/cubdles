@@ -1,5 +1,6 @@
-// Generated from the Supabase project schema. Regenerate after every migration:
-//   supabase gen types typescript --project-id <ref> > src/lib/supabase/database.types.ts
+// Generated from the Supabase project with `supabase gen types typescript` (via the Supabase MCP).
+// Do not edit by hand: regenerate after every migration.
+
 export type Json =
   | string
   | number
@@ -9,6 +10,8 @@ export type Json =
   | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.18";
   };
@@ -53,9 +56,18 @@ export type Database = {
         ];
       };
       age_gate_blocks: {
-        Row: { created_at: string; email_hash: string };
-        Insert: { created_at?: string; email_hash: string };
-        Update: { created_at?: string; email_hash?: string };
+        Row: {
+          created_at: string;
+          email_hash: string;
+        };
+        Insert: {
+          created_at?: string;
+          email_hash: string;
+        };
+        Update: {
+          created_at?: string;
+          email_hash?: string;
+        };
         Relationships: [];
       };
       audit_logs: {
@@ -92,8 +104,16 @@ export type Database = {
         Relationships: [];
       };
       blocks: {
-        Row: { blocked_id: string; blocker_id: string; created_at: string };
-        Insert: { blocked_id: string; blocker_id: string; created_at?: string };
+        Row: {
+          blocked_id: string;
+          blocker_id: string;
+          created_at: string;
+        };
+        Insert: {
+          blocked_id: string;
+          blocker_id: string;
+          created_at?: string;
+        };
         Update: {
           blocked_id?: string;
           blocker_id?: string;
@@ -115,6 +135,60 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      cities: {
+        Row: {
+          admin_code: string | null;
+          ascii_name: string;
+          country_code: string;
+          id: number;
+          location: unknown;
+          name: string;
+          population: number;
+        };
+        Insert: {
+          admin_code?: string | null;
+          ascii_name: string;
+          country_code: string;
+          id: number;
+          location: unknown;
+          name: string;
+          population?: number;
+        };
+        Update: {
+          admin_code?: string | null;
+          ascii_name?: string;
+          country_code?: string;
+          id?: number;
+          location?: unknown;
+          name?: string;
+          population?: number;
+        };
+        Relationships: [];
+      };
+      compatibility_config: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          created_by: string | null;
+          version: number;
+          weights: Json;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          version?: never;
+          weights: Json;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          version?: never;
+          weights?: Json;
+        };
+        Relationships: [];
       };
       contact_messages: {
         Row: {
@@ -148,6 +222,72 @@ export type Database = {
           user_id?: string | null;
         };
         Relationships: [];
+      };
+      country_rules: {
+        Row: {
+          advisory: string | null;
+          allowed: boolean;
+          country_code: string;
+          note: string | null;
+          reviewed_on: string | null;
+        };
+        Insert: {
+          advisory?: string | null;
+          allowed?: boolean;
+          country_code: string;
+          note?: string | null;
+          reviewed_on?: string | null;
+        };
+        Update: {
+          advisory?: string | null;
+          allowed?: boolean;
+          country_code?: string;
+          note?: string | null;
+          reviewed_on?: string | null;
+        };
+        Relationships: [];
+      };
+      daily_picks: {
+        Row: {
+          pick_date: string;
+          pick_id: string;
+          rank: number;
+          reasons: Json;
+          score: number;
+          user_id: string;
+        };
+        Insert: {
+          pick_date: string;
+          pick_id: string;
+          rank: number;
+          reasons?: Json;
+          score: number;
+          user_id: string;
+        };
+        Update: {
+          pick_date?: string;
+          pick_id?: string;
+          rank?: number;
+          reasons?: Json;
+          score?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "daily_picks_pick_id_fkey";
+            columns: ["pick_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "daily_picks_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       entitlements: {
         Row: {
@@ -202,235 +342,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      likes: {
-        Row: {
-          created_at: string;
-          from_id: string;
-          kind: Database["public"]["Enums"]["like_kind"];
-          note: string | null;
-          to_id: string;
-        };
-        Insert: {
-          created_at?: string;
-          from_id: string;
-          kind?: Database["public"]["Enums"]["like_kind"];
-          note?: string | null;
-          to_id: string;
-        };
-        Update: {
-          created_at?: string;
-          from_id?: string;
-          kind?: Database["public"]["Enums"]["like_kind"];
-          note?: string | null;
-          to_id?: string;
-        };
-        Relationships: [];
-      };
-      passes: {
-        Row: { created_at: string; from_id: string; to_id: string };
-        Insert: { created_at?: string; from_id: string; to_id: string };
-        Update: { created_at?: string; from_id?: string; to_id?: string };
-        Relationships: [];
-      };
-      reports: {
-        Row: {
-          id: string;
-          reporter_id: string | null;
-          reported_id: string | null;
-          match_id: string | null;
-          message_id: string | null;
-          reason: Database["public"]["Enums"]["report_reason"];
-          details: string | null;
-          priority: Database["public"]["Enums"]["report_priority"];
-          status: Database["public"]["Enums"]["report_status"];
-          action: string | null;
-          resolution: string | null;
-          reviewed_by: string | null;
-          reviewed_at: string | null;
-          created_at: string;
-        };
-        Insert: never;
-        Update: never;
-        Relationships: [];
-      };
-      safety_notices: {
-        Row: {
-          id: string;
-          profile_id: string;
-          kind: Database["public"]["Enums"]["safety_notice_kind"];
-          subject_id: string | null;
-          subject_name: string | null;
-          last_contact_at: string | null;
-          reason: Database["public"]["Enums"]["report_reason"] | null;
-          created_at: string;
-          dismissed_at: string | null;
-        };
-        Insert: never;
-        Update: never;
-        Relationships: [];
-      };
-      notification_settings: {
-        Row: {
-          profile_id: string;
-          email_matches: boolean;
-          email_messages: boolean;
-          updated_at: string;
-        };
-        Insert: {
-          profile_id: string;
-          email_matches?: boolean;
-          email_messages?: boolean;
-          updated_at?: string;
-        };
-        Update: {
-          profile_id?: string;
-          email_matches?: boolean;
-          email_messages?: boolean;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      verification_requests: {
-        Row: {
-          id: string
-          profile_id: string
-          pose: string
-          storage_path: string | null
-          status: Database["public"]["Enums"]["verification_status"]
-          note: string | null
-          reviewed_by: string | null
-          reviewed_at: string | null
-          created_at: string
-        }
-        Insert: never
-        Update: never
-        Relationships: []
-      }
-      subscriptions: {
-        Row: {
-          id: string
-          profile_id: string
-          plan_id: string
-          price_id: string | null
-          provider: string
-          provider_subscription_id: string
-          status: Database["public"]["Enums"]["subscription_status"]
-          current_period_end: string | null
-          cancel_at_period_end: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: never
-        Update: { status?: Database["public"]["Enums"]["subscription_status"]; current_period_end?: string | null; cancel_at_period_end?: boolean; updated_at?: string }
-        Relationships: []
-      }
-      payment_events: {
-        Row: { provider_event_id: string; provider: string; event_type: string; payload: Json; received_at: string }
-        Insert: { provider_event_id: string; provider?: string; event_type: string; payload: Json; received_at?: string }
-        Update: never
-        Relationships: []
-      }
-      messages: {
-        Row: {
-          id: string;
-          match_id: string;
-          sender_id: string;
-          body: string;
-          client_id: string;
-          created_at: string;
-        };
-        Insert: never;
-        Update: never;
-        Relationships: [];
-      };
-      match_reads: {
-        Row: { match_id: string; profile_id: string; last_read_at: string };
-        Insert: never;
-        Update: never;
-        Relationships: [];
-      };
-      matches: {
-        Row: {
-          created_at: string;
-          ended_at: string | null;
-          ended_by: string | null;
-          ended_reason: Database["public"]["Enums"]["match_end_reason"] | null;
-          id: string;
-          last_message_at: string | null;
-          user_a: string;
-          user_b: string;
-        };
-        Insert: {
-          created_at?: string;
-          ended_at?: string | null;
-          ended_by?: string | null;
-          ended_reason?: Database["public"]["Enums"]["match_end_reason"] | null;
-          id?: string;
-          user_a: string;
-          user_b: string;
-        };
-        Update: {
-          created_at?: string;
-          ended_at?: string | null;
-          ended_by?: string | null;
-          ended_reason?: Database["public"]["Enums"]["match_end_reason"] | null;
-          id?: string;
-          user_a?: string;
-          user_b?: string;
-        };
-        Relationships: [];
-      };
-      daily_picks: {
-        Row: {
-          pick_date: string;
-          pick_id: string;
-          rank: number;
-          reasons: Json;
-          score: number;
-          user_id: string;
-        };
-        Insert: {
-          pick_date: string;
-          pick_id: string;
-          rank: number;
-          reasons?: Json;
-          score: number;
-          user_id: string;
-        };
-        Update: {
-          pick_date?: string;
-          pick_id?: string;
-          rank?: number;
-          reasons?: Json;
-          score?: number;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
-      compatibility_config: {
-        Row: {
-          active: boolean;
-          created_at: string;
-          created_by: string | null;
-          version: number;
-          weights: Json;
-        };
-        Insert: {
-          active?: boolean;
-          created_at?: string;
-          created_by?: string | null;
-          version?: never;
-          weights: Json;
-        };
-        Update: {
-          active?: boolean;
-          created_at?: string;
-          created_by?: string | null;
-          version?: never;
-          weights?: Json;
-        };
-        Relationships: [];
-      };
       lifestyle: {
         Row: {
           diet: string | null;
@@ -474,6 +385,311 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      likes: {
+        Row: {
+          created_at: string;
+          from_id: string;
+          kind: Database["public"]["Enums"]["like_kind"];
+          note: string | null;
+          to_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          from_id: string;
+          kind?: Database["public"]["Enums"]["like_kind"];
+          note?: string | null;
+          to_id: string;
+        };
+        Update: {
+          created_at?: string;
+          from_id?: string;
+          kind?: Database["public"]["Enums"]["like_kind"];
+          note?: string | null;
+          to_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "likes_from_id_fkey";
+            columns: ["from_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "likes_to_id_fkey";
+            columns: ["to_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      match_reads: {
+        Row: {
+          last_read_at: string;
+          match_id: string;
+          profile_id: string;
+        };
+        Insert: {
+          last_read_at?: string;
+          match_id: string;
+          profile_id: string;
+        };
+        Update: {
+          last_read_at?: string;
+          match_id?: string;
+          profile_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "match_reads_match_id_fkey";
+            columns: ["match_id"];
+            isOneToOne: false;
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "match_reads_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      matches: {
+        Row: {
+          created_at: string;
+          ended_at: string | null;
+          ended_by: string | null;
+          ended_reason: Database["public"]["Enums"]["match_end_reason"] | null;
+          id: string;
+          last_message_at: string | null;
+          user_a: string;
+          user_b: string;
+        };
+        Insert: {
+          created_at?: string;
+          ended_at?: string | null;
+          ended_by?: string | null;
+          ended_reason?: Database["public"]["Enums"]["match_end_reason"] | null;
+          id?: string;
+          last_message_at?: string | null;
+          user_a: string;
+          user_b: string;
+        };
+        Update: {
+          created_at?: string;
+          ended_at?: string | null;
+          ended_by?: string | null;
+          ended_reason?: Database["public"]["Enums"]["match_end_reason"] | null;
+          id?: string;
+          last_message_at?: string | null;
+          user_a?: string;
+          user_b?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "matches_ended_by_fkey";
+            columns: ["ended_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "matches_user_a_fkey";
+            columns: ["user_a"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "matches_user_b_fkey";
+            columns: ["user_b"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      messages: {
+        Row: {
+          body: string;
+          client_id: string;
+          created_at: string;
+          id: string;
+          match_id: string;
+          sender_id: string;
+        };
+        Insert: {
+          body: string;
+          client_id: string;
+          created_at?: string;
+          id?: string;
+          match_id: string;
+          sender_id: string;
+        };
+        Update: {
+          body?: string;
+          client_id?: string;
+          created_at?: string;
+          id?: string;
+          match_id?: string;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey";
+            columns: ["match_id"];
+            isOneToOne: false;
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      notification_outbox: {
+        Row: {
+          attempts: number;
+          claimed_at: string | null;
+          created_at: string;
+          id: number;
+          kind: Database["public"]["Enums"]["notification_kind"];
+          last_error: string | null;
+          profile_id: string;
+          ref_id: string;
+          send_after: string;
+          sent_at: string | null;
+          skipped: string | null;
+        };
+        Insert: {
+          attempts?: number;
+          claimed_at?: string | null;
+          created_at?: string;
+          id?: never;
+          kind: Database["public"]["Enums"]["notification_kind"];
+          last_error?: string | null;
+          profile_id: string;
+          ref_id: string;
+          send_after?: string;
+          sent_at?: string | null;
+          skipped?: string | null;
+        };
+        Update: {
+          attempts?: number;
+          claimed_at?: string | null;
+          created_at?: string;
+          id?: never;
+          kind?: Database["public"]["Enums"]["notification_kind"];
+          last_error?: string | null;
+          profile_id?: string;
+          ref_id?: string;
+          send_after?: string;
+          sent_at?: string | null;
+          skipped?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_outbox_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      notification_settings: {
+        Row: {
+          email_matches: boolean;
+          email_messages: boolean;
+          profile_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          email_matches?: boolean;
+          email_messages?: boolean;
+          profile_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          email_matches?: boolean;
+          email_messages?: boolean;
+          profile_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_settings_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      passes: {
+        Row: {
+          created_at: string;
+          from_id: string;
+          to_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          from_id: string;
+          to_id: string;
+        };
+        Update: {
+          created_at?: string;
+          from_id?: string;
+          to_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "passes_from_id_fkey";
+            columns: ["from_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "passes_to_id_fkey";
+            columns: ["to_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payment_events: {
+        Row: {
+          event_type: string;
+          payload: Json;
+          provider: string;
+          provider_event_id: string;
+          received_at: string;
+        };
+        Insert: {
+          event_type: string;
+          payload: Json;
+          provider?: string;
+          provider_event_id: string;
+          received_at?: string;
+        };
+        Update: {
+          event_type?: string;
+          payload?: Json;
+          provider?: string;
+          provider_event_id?: string;
+          received_at?: string;
+        };
+        Relationships: [];
       };
       photos: {
         Row: {
@@ -616,6 +832,7 @@ export type Database = {
           age_max?: number;
           age_min?: number;
           dealbreakers?: Json;
+          distance_unit?: string;
           intentions?: Database["public"]["Enums"]["relationship_intention"][];
           max_distance_km?: number;
           profile_id: string;
@@ -627,6 +844,7 @@ export type Database = {
           age_max?: number;
           age_min?: number;
           dealbreakers?: Json;
+          distance_unit?: string;
           intentions?: Database["public"]["Enums"]["relationship_intention"][];
           max_distance_km?: number;
           profile_id?: string;
@@ -683,9 +901,18 @@ export type Database = {
         ];
       };
       profile_interests: {
-        Row: { interest_id: number; profile_id: string };
-        Insert: { interest_id: number; profile_id: string };
-        Update: { interest_id?: number; profile_id?: string };
+        Row: {
+          interest_id: number;
+          profile_id: string;
+        };
+        Insert: {
+          interest_id: number;
+          profile_id: string;
+        };
+        Update: {
+          interest_id?: number;
+          profile_id?: string;
+        };
         Relationships: [
           {
             foreignKeyName: "profile_interests_interest_id_fkey";
@@ -708,40 +935,48 @@ export type Database = {
           birth_date: string | null;
           created_at: string;
           deletion_requested_at: string | null;
-          status_before_deletion:
-            Database["public"]["Enums"]["profile_status"] | null;
-          timezone: string | null;
           location: unknown;
           marketing_consent: boolean;
           phone_e164: string | null;
           phone_verified_at: string | null;
           privacy_accepted_at: string | null;
           profile_id: string;
+          status_before_deletion:
+            Database["public"]["Enums"]["profile_status"] | null;
           terms_accepted_at: string | null;
+          timezone: string | null;
           updated_at: string;
         };
         Insert: {
           birth_date?: string | null;
           created_at?: string;
+          deletion_requested_at?: string | null;
           location?: unknown;
           marketing_consent?: boolean;
           phone_e164?: string | null;
           phone_verified_at?: string | null;
           privacy_accepted_at?: string | null;
           profile_id: string;
+          status_before_deletion?:
+            Database["public"]["Enums"]["profile_status"] | null;
           terms_accepted_at?: string | null;
+          timezone?: string | null;
           updated_at?: string;
         };
         Update: {
           birth_date?: string | null;
           created_at?: string;
+          deletion_requested_at?: string | null;
           location?: unknown;
           marketing_consent?: boolean;
           phone_e164?: string | null;
           phone_verified_at?: string | null;
           privacy_accepted_at?: string | null;
           profile_id?: string;
+          status_before_deletion?:
+            Database["public"]["Enums"]["profile_status"] | null;
           terms_accepted_at?: string | null;
+          timezone?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -810,12 +1045,13 @@ export type Database = {
           pronouns: string | null;
           status: Database["public"]["Enums"]["profile_status"];
           status_reason: string | null;
-          verified_at: string | null;
           updated_at: string;
+          verified_at: string | null;
         };
         Insert: {
           bio?: string | null;
           city?: string | null;
+          country_code?: string | null;
           created_at?: string;
           display_name?: string | null;
           education?: string | null;
@@ -832,10 +1068,12 @@ export type Database = {
           status?: Database["public"]["Enums"]["profile_status"];
           status_reason?: string | null;
           updated_at?: string;
+          verified_at?: string | null;
         };
         Update: {
           bio?: string | null;
           city?: string | null;
+          country_code?: string | null;
           created_at?: string;
           display_name?: string | null;
           education?: string | null;
@@ -852,14 +1090,158 @@ export type Database = {
           status?: Database["public"]["Enums"]["profile_status"];
           status_reason?: string | null;
           updated_at?: string;
+          verified_at?: string | null;
         };
         Relationships: [];
       };
       prompts: {
-        Row: { active: boolean; id: number; text: string };
-        Insert: { active?: boolean; id?: never; text: string };
-        Update: { active?: boolean; id?: never; text?: string };
+        Row: {
+          active: boolean;
+          id: number;
+          text: string;
+        };
+        Insert: {
+          active?: boolean;
+          id?: never;
+          text: string;
+        };
+        Update: {
+          active?: boolean;
+          id?: never;
+          text?: string;
+        };
         Relationships: [];
+      };
+      reports: {
+        Row: {
+          action: string | null;
+          created_at: string;
+          details: string | null;
+          id: string;
+          match_id: string | null;
+          message_id: string | null;
+          priority: Database["public"]["Enums"]["report_priority"];
+          reason: Database["public"]["Enums"]["report_reason"];
+          reported_id: string | null;
+          reporter_id: string | null;
+          resolution: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database["public"]["Enums"]["report_status"];
+        };
+        Insert: {
+          action?: string | null;
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          match_id?: string | null;
+          message_id?: string | null;
+          priority?: Database["public"]["Enums"]["report_priority"];
+          reason: Database["public"]["Enums"]["report_reason"];
+          reported_id?: string | null;
+          reporter_id?: string | null;
+          resolution?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["report_status"];
+        };
+        Update: {
+          action?: string | null;
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          match_id?: string | null;
+          message_id?: string | null;
+          priority?: Database["public"]["Enums"]["report_priority"];
+          reason?: Database["public"]["Enums"]["report_reason"];
+          reported_id?: string | null;
+          reporter_id?: string | null;
+          resolution?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["report_status"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reports_match_id_fkey";
+            columns: ["match_id"];
+            isOneToOne: false;
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_message_id_fkey";
+            columns: ["message_id"];
+            isOneToOne: false;
+            referencedRelation: "messages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_reported_id_fkey";
+            columns: ["reported_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey";
+            columns: ["reporter_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      safety_notices: {
+        Row: {
+          created_at: string;
+          dismissed_at: string | null;
+          id: string;
+          kind: Database["public"]["Enums"]["safety_notice_kind"];
+          last_contact_at: string | null;
+          profile_id: string;
+          reason: Database["public"]["Enums"]["report_reason"] | null;
+          subject_id: string | null;
+          subject_name: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          dismissed_at?: string | null;
+          id?: string;
+          kind: Database["public"]["Enums"]["safety_notice_kind"];
+          last_contact_at?: string | null;
+          profile_id: string;
+          reason?: Database["public"]["Enums"]["report_reason"] | null;
+          subject_id?: string | null;
+          subject_name?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          dismissed_at?: string | null;
+          id?: string;
+          kind?: Database["public"]["Enums"]["safety_notice_kind"];
+          last_contact_at?: string | null;
+          profile_id?: string;
+          reason?: Database["public"]["Enums"]["report_reason"] | null;
+          subject_id?: string | null;
+          subject_name?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "safety_notices_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "safety_notices_subject_id_fkey";
+            columns: ["subject_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       staff_roles: {
         Row: {
@@ -882,61 +1264,203 @@ export type Database = {
         };
         Relationships: [];
       };
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean;
+          created_at: string;
+          current_period_end: string | null;
+          id: string;
+          plan_id: string;
+          price_id: string | null;
+          profile_id: string;
+          provider: string;
+          provider_subscription_id: string;
+          status: Database["public"]["Enums"]["subscription_status"];
+          updated_at: string;
+        };
+        Insert: {
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          current_period_end?: string | null;
+          id?: string;
+          plan_id: string;
+          price_id?: string | null;
+          profile_id: string;
+          provider?: string;
+          provider_subscription_id: string;
+          status?: Database["public"]["Enums"]["subscription_status"];
+          updated_at?: string;
+        };
+        Update: {
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          current_period_end?: string | null;
+          id?: string;
+          plan_id?: string;
+          price_id?: string | null;
+          profile_id?: string;
+          provider?: string;
+          provider_subscription_id?: string;
+          status?: Database["public"]["Enums"]["subscription_status"];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey";
+            columns: ["plan_id"];
+            isOneToOne: false;
+            referencedRelation: "plans";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscriptions_price_id_fkey";
+            columns: ["price_id"];
+            isOneToOne: false;
+            referencedRelation: "plan_prices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscriptions_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      verification_requests: {
+        Row: {
+          created_at: string;
+          id: string;
+          note: string | null;
+          pose: string;
+          profile_id: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database["public"]["Enums"]["verification_status"];
+          storage_path: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          note?: string | null;
+          pose: string;
+          profile_id: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["verification_status"];
+          storage_path?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          note?: string | null;
+          pose?: string;
+          profile_id?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["verification_status"];
+          storage_path?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "verification_requests_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      my_membership: { Args: never; Returns: Json }
-      upsert_subscription: {
-        Args: {
-          p_profile: string
-          p_price: string
-          p_provider_subscription_id: string
-          p_status: Database["public"]["Enums"]["subscription_status"]
-          p_current_period_end?: string | null
-          p_cancel_at_period_end?: boolean | null
-        }
-        Returns: string
-      }
-      update_subscription_status: {
-        Args: { p_provider_subscription_id: string; p_status: Database["public"]["Enums"]["subscription_status"]; p_current_period_end?: string | null }
-        Returns: boolean | null
-      }
-      start_verification: {
-        Args: never
-        Returns: { id: string; profile_id: string; pose: string; storage_path: string | null; status: Database["public"]["Enums"]["verification_status"]; note: string | null; reviewed_by: string | null; reviewed_at: string | null; created_at: string }
-      }
-      submit_verification: { Args: { p_request: string; p_path: string }; Returns: undefined }
-      staff_pending_verifications: {
-        Args: { p_limit?: number }
-        Returns: { request_id: string; profile_id: string; display_name: string | null; pose: string; selfie_path: string | null; photo_paths: string[]; submitted_at: string }[]
-      }
-      staff_decide_verification: { Args: { p_request: string; p_approve: boolean; p_note?: string | null }; Returns: string | null }
-      verified_profiles: { Args: { p_ids: string[] }; Returns: string[] }
+      accept_terms: { Args: { p_marketing?: boolean }; Returns: undefined };
+      age_in_years: { Args: { birth: string }; Returns: number };
       claim_notifications: {
         Args: { p_limit?: number };
         Returns: {
+          email: string;
           id: number;
           kind: Database["public"]["Enums"]["notification_kind"];
+          last_contact_at: string;
+          other_name: string;
           profile_id: string;
-          email: string;
-          recipient_name: string | null;
-          other_name: string | null;
+          recipient_name: string;
           ref_id: string;
-          last_contact_at: string | null;
-          timezone: string | null;
+          timezone: string;
         }[];
       };
+      compact_photo_positions: { Args: never; Returns: undefined };
       complete_notification: {
-        Args: { p_id: number; p_ok: boolean; p_error?: string | null };
+        Args: { p_error?: string; p_id: number; p_ok: boolean };
         Returns: undefined;
       };
+      complete_onboarding: { Args: never; Returns: undefined };
+      conversation_seen_at: { Args: { p_match_id: string }; Returns: string };
+      create_report: {
+        Args: {
+          p_block?: boolean;
+          p_details?: string;
+          p_match_id?: string;
+          p_message_id?: string;
+          p_reason: Database["public"]["Enums"]["report_reason"];
+          p_reported: string;
+        };
+        Returns: string;
+      };
+      discover: {
+        Args: { p_filters?: Json; p_limit?: number; p_offset?: number };
+        Returns: {
+          profile_id: string;
+          reasons: Json;
+          score: number;
+        }[];
+      };
+      dismiss_safety_notice: { Args: { p_id: string }; Returns: undefined };
+      export_my_data: { Args: never; Returns: Json };
+      get_daily_picks: {
+        Args: never;
+        Returns: {
+          profile_id: string;
+          reasons: Json;
+          score: number;
+        }[];
+      };
+      likes_received_summary: { Args: never; Returns: Json };
+      mark_conversation_read: {
+        Args: { p_match_id: string };
+        Returns: undefined;
+      };
+      my_conversations: {
+        Args: never;
+        Returns: {
+          last_message_at: string;
+          last_message_mine: boolean;
+          last_message_preview: string;
+          match_id: string;
+          matched_at: string;
+          other_id: string;
+          unread_count: number;
+        }[];
+      };
+      my_features: { Args: never; Returns: Json };
+      my_membership: { Args: never; Returns: Json };
+      my_safety_advisory: { Args: never; Returns: Json };
+      my_staff_roles: { Args: never; Returns: string[] };
+      next_photo_position: { Args: never; Returns: number };
       notifications_due: { Args: never; Returns: boolean };
-      set_notification_settings: {
-        Args: { p_email_matches: boolean; p_email_messages: boolean };
-        Returns: undefined;
+      orphaned_storage_files: {
+        Args: { p_limit?: number };
+        Returns: {
+          bucket: string;
+          path: string;
+        }[];
       };
+      profile_age: { Args: { target: string }; Returns: number };
+      profile_cards: { Args: { p_ids: string[] }; Returns: Json };
       rate_limit_hit: {
         Args: {
           p_bucket: string;
@@ -946,128 +1470,37 @@ export type Database = {
         };
         Returns: boolean;
       };
-      export_my_data: { Args: never; Returns: Json };
-      create_report: {
-        Args: {
-          p_reported: string;
-          p_reason: Database["public"]["Enums"]["report_reason"];
-          p_details?: string | null;
-          p_match_id?: string | null;
-          p_message_id?: string | null;
-          p_block?: boolean;
-        };
-        Returns: string;
-      };
-      dismiss_safety_notice: { Args: { p_id: string }; Returns: undefined };
-      my_staff_roles: { Args: never; Returns: string[] };
-      staff_queue_counts: { Args: never; Returns: Json };
-      staff_pending_photos: {
-        Args: { p_limit?: number };
+      reorder_photos: { Args: { p_ids: string[] }; Returns: undefined };
+      request_account_deletion: { Args: never; Returns: undefined };
+      restore_account: { Args: never; Returns: undefined };
+      search_cities: {
+        Args: { p_limit?: number; p_query: string };
         Returns: {
-          photo_id: string;
-          profile_id: string;
-          storage_path: string;
-          display_name: string | null;
-          profile_status: Database["public"]["Enums"]["profile_status"];
-          uploaded_at: string;
+          admin_code: string;
+          country_code: string;
+          id: number;
+          name: string;
+          population: number;
         }[];
-      };
-      staff_moderate_photo: {
-        Args: { p_photo: string; p_approve: boolean; p_note?: string | null };
-        Returns: undefined;
-      };
-      staff_list_reports: {
-        Args: {
-          p_status?: Database["public"]["Enums"]["report_status"];
-          p_limit?: number;
-        };
-        Returns: {
-          report_id: string;
-          reason: Database["public"]["Enums"]["report_reason"];
-          priority: Database["public"]["Enums"]["report_priority"];
-          status: Database["public"]["Enums"]["report_status"];
-          details: string | null;
-          created_at: string;
-          reported_id: string | null;
-          reported_name: string | null;
-          reported_status: Database["public"]["Enums"]["profile_status"] | null;
-          reporter_id: string | null;
-          reporter_name: string | null;
-          reports_against: number;
-        }[];
-      };
-      staff_report_detail: { Args: { p_report: string }; Returns: Json };
-      staff_resolve_report: {
-        Args: {
-          p_report: string;
-          p_action: string;
-          p_note: string;
-          p_fraud?: boolean;
-        };
-        Returns: Json;
       };
       send_message: {
-        Args: { p_match_id: string; p_body: string; p_client_id: string };
+        Args: { p_body: string; p_client_id: string; p_match_id: string };
         Returns: {
-          id: string;
-          match_id: string;
-          sender_id: string;
           body: string;
           client_id: string;
           created_at: string;
+          id: string;
+          match_id: string;
+          sender_id: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "messages";
+          isOneToOne: true;
+          isSetofReturn: false;
         };
       };
-      mark_conversation_read: {
-        Args: { p_match_id: string };
-        Returns: undefined;
-      };
-      my_conversations: {
-        Args: never;
-        Returns: {
-          match_id: string;
-          other_id: string;
-          matched_at: string;
-          last_message_at: string | null;
-          last_message_preview: string | null;
-          last_message_mine: boolean | null;
-          unread_count: number;
-        }[];
-      };
-      unread_conversations_count: { Args: never; Returns: number };
-      conversation_seen_at: {
-        Args: { p_match_id: string };
-        Returns: string | null;
-      };
-      accept_terms: { Args: { p_marketing?: boolean }; Returns: undefined };
-      age_in_years: { Args: { birth: string }; Returns: number };
-      compact_photo_positions: { Args: never; Returns: undefined };
-      complete_onboarding: { Args: never; Returns: undefined };
-      discover: {
-        Args: { p_filters?: Json; p_limit?: number; p_offset?: number };
-        Returns: { profile_id: string; reasons: Json; score: number }[];
-      };
-      get_daily_picks: {
-        Args: never;
-        Returns: { profile_id: string; reasons: Json; score: number }[];
-      };
-      likes_received_summary: { Args: never; Returns: Json };
-      my_features: { Args: never; Returns: Json };
-      my_safety_advisory: { Args: never; Returns: Json };
       set_incognito: { Args: { p_on: boolean }; Returns: undefined };
-      profile_cards: { Args: { p_ids: string[] }; Returns: Json };
-      request_account_deletion: { Args: never; Returns: undefined };
-      restore_account: { Args: never; Returns: undefined };
-      set_paused: { Args: { p_paused: boolean }; Returns: undefined };
-      swipe: {
-        Args: { p_action: string; p_note?: string; p_target: string };
-        Returns: Json;
-      };
-      touch_last_active: { Args: never; Returns: undefined };
-      undo_last_pass: { Args: never; Returns: string };
-      unmatch: { Args: { p_match_id: string }; Returns: undefined };
-      next_photo_position: { Args: never; Returns: number };
-      profile_age: { Args: { target: string }; Returns: number };
-      reorder_photos: { Args: { p_ids: string[] }; Returns: undefined };
       set_location: {
         Args: {
           p_city_id?: number;
@@ -1077,19 +1510,76 @@ export type Database = {
         };
         Returns: Json;
       };
-      search_cities: {
-        Args: { p_limit?: number; p_query: string };
-        Returns: {
-          admin_code: string | null;
-          country_code: string;
-          id: number;
-          name: string;
-          population: number;
-        }[];
+      set_notification_settings: {
+        Args: { p_email_matches: boolean; p_email_messages: boolean };
+        Returns: undefined;
       };
-      set_timezone: { Args: { p_timezone: string }; Returns: undefined };
+      set_paused: { Args: { p_paused: boolean }; Returns: undefined };
       set_profile_interests: { Args: { p_ids: number[] }; Returns: undefined };
       set_profile_prompts: { Args: { p_answers: Json }; Returns: undefined };
+      set_timezone: { Args: { p_timezone: string }; Returns: undefined };
+      staff_decide_verification: {
+        Args: { p_approve: boolean; p_note?: string; p_request: string };
+        Returns: string;
+      };
+      staff_list_reports: {
+        Args: {
+          p_limit?: number;
+          p_status?: Database["public"]["Enums"]["report_status"];
+        };
+        Returns: {
+          created_at: string;
+          details: string;
+          priority: Database["public"]["Enums"]["report_priority"];
+          reason: Database["public"]["Enums"]["report_reason"];
+          report_id: string;
+          reported_id: string;
+          reported_name: string;
+          reported_status: Database["public"]["Enums"]["profile_status"];
+          reporter_id: string;
+          reporter_name: string;
+          reports_against: number;
+          status: Database["public"]["Enums"]["report_status"];
+        }[];
+      };
+      staff_moderate_photo: {
+        Args: { p_approve: boolean; p_note?: string; p_photo: string };
+        Returns: undefined;
+      };
+      staff_pending_photos: {
+        Args: { p_limit?: number };
+        Returns: {
+          display_name: string;
+          photo_id: string;
+          profile_id: string;
+          profile_status: Database["public"]["Enums"]["profile_status"];
+          storage_path: string;
+          uploaded_at: string;
+        }[];
+      };
+      staff_pending_verifications: {
+        Args: { p_limit?: number };
+        Returns: {
+          display_name: string;
+          photo_paths: string[];
+          pose: string;
+          profile_id: string;
+          request_id: string;
+          selfie_path: string;
+          submitted_at: string;
+        }[];
+      };
+      staff_queue_counts: { Args: never; Returns: Json };
+      staff_report_detail: { Args: { p_report: string }; Returns: Json };
+      staff_resolve_report: {
+        Args: {
+          p_action: string;
+          p_fraud?: boolean;
+          p_note: string;
+          p_report: string;
+        };
+        Returns: Json;
+      };
       staff_set_profile_status: {
         Args: {
           new_status: Database["public"]["Enums"]["profile_status"];
@@ -1098,7 +1588,59 @@ export type Database = {
         };
         Returns: undefined;
       };
+      start_verification: {
+        Args: never;
+        Returns: {
+          created_at: string;
+          id: string;
+          note: string | null;
+          pose: string;
+          profile_id: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database["public"]["Enums"]["verification_status"];
+          storage_path: string | null;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "verification_requests";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       submit_birth_date: { Args: { p_birth_date: string }; Returns: boolean };
+      submit_verification: {
+        Args: { p_path: string; p_request: string };
+        Returns: undefined;
+      };
+      swipe: {
+        Args: { p_action: string; p_note?: string; p_target: string };
+        Returns: Json;
+      };
+      touch_last_active: { Args: never; Returns: undefined };
+      undo_last_pass: { Args: never; Returns: string };
+      unmatch: { Args: { p_match_id: string }; Returns: undefined };
+      unread_conversations_count: { Args: never; Returns: number };
+      update_subscription_status: {
+        Args: {
+          p_current_period_end?: string;
+          p_provider_subscription_id: string;
+          p_status: Database["public"]["Enums"]["subscription_status"];
+        };
+        Returns: boolean;
+      };
+      upsert_subscription: {
+        Args: {
+          p_cancel_at_period_end?: boolean;
+          p_current_period_end?: string;
+          p_price: string;
+          p_profile: string;
+          p_provider_subscription_id: string;
+          p_status: Database["public"]["Enums"]["subscription_status"];
+        };
+        Returns: string;
+      };
+      verified_profiles: { Args: { p_ids: string[] }; Returns: string[] };
       write_audit_log: {
         Args: {
           p_action: string;
@@ -1111,9 +1653,21 @@ export type Database = {
       };
     };
     Enums: {
-      subscription_status: "created" | "authenticated" | "active" | "pending" | "halted" | "cancelled" | "completed" | "expired"
-      verification_status: "awaiting_photo" | "pending" | "approved" | "rejected"
+      affection_pace: "slow" | "steady" | "quick";
+      cuddle_style: "big_spoon" | "little_spoon" | "either" | "not_sure";
+      like_kind: "like" | "super";
+      match_end_reason: "unmatch" | "block" | "moderation" | "account_deleted";
+      moderation_status: "pending" | "approved" | "rejected";
       notification_kind: "match" | "message" | "fraud_ban";
+      profile_status:
+        "onboarding" | "active" | "paused" | "suspended" | "banned" | "deleted";
+      relationship_intention:
+        | "life_partner"
+        | "long_term"
+        | "long_term_open"
+        | "short_term_open"
+        | "figuring_out";
+      report_priority: "normal" | "urgent";
       report_reason:
         | "fake_profile"
         | "scam"
@@ -1125,22 +1679,19 @@ export type Database = {
         | "spam"
         | "other";
       report_status: "open" | "actioned" | "dismissed";
-      report_priority: "normal" | "urgent";
       safety_notice_kind: "warning" | "fraud_ban";
-      affection_pace: "slow" | "steady" | "quick";
-      cuddle_style: "big_spoon" | "little_spoon" | "either" | "not_sure";
-      like_kind: "like" | "super";
-      match_end_reason: "unmatch" | "block" | "moderation" | "account_deleted";
-      moderation_status: "pending" | "approved" | "rejected";
-      profile_status:
-        "onboarding" | "active" | "paused" | "suspended" | "banned" | "deleted";
-      relationship_intention:
-        | "life_partner"
-        | "long_term"
-        | "long_term_open"
-        | "short_term_open"
-        | "figuring_out";
       staff_role: "admin" | "moderator" | "support";
+      subscription_status:
+        | "created"
+        | "authenticated"
+        | "active"
+        | "pending"
+        | "halted"
+        | "cancelled"
+        | "completed"
+        | "expired";
+      verification_status:
+        "awaiting_photo" | "pending" | "approved" | "rejected";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -1149,16 +1700,177 @@ export type Database = {
 };
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
 type DefaultSchema = DatabaseWithoutInternals[Extract<
   keyof Database,
   "public"
 >];
 
-export type Tables<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Row"];
-export type TablesInsert<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Insert"];
-export type TablesUpdate<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Update"];
-export type Enums<T extends keyof DefaultSchema["Enums"]> =
-  DefaultSchema["Enums"][T];
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  public: {
+    Enums: {
+      affection_pace: ["slow", "steady", "quick"],
+      cuddle_style: ["big_spoon", "little_spoon", "either", "not_sure"],
+      like_kind: ["like", "super"],
+      match_end_reason: ["unmatch", "block", "moderation", "account_deleted"],
+      moderation_status: ["pending", "approved", "rejected"],
+      notification_kind: ["match", "message", "fraud_ban"],
+      profile_status: [
+        "onboarding",
+        "active",
+        "paused",
+        "suspended",
+        "banned",
+        "deleted",
+      ],
+      relationship_intention: [
+        "life_partner",
+        "long_term",
+        "long_term_open",
+        "short_term_open",
+        "figuring_out",
+      ],
+      report_priority: ["normal", "urgent"],
+      report_reason: [
+        "fake_profile",
+        "scam",
+        "harassment",
+        "inappropriate_content",
+        "hate",
+        "underage",
+        "offline_safety",
+        "spam",
+        "other",
+      ],
+      report_status: ["open", "actioned", "dismissed"],
+      safety_notice_kind: ["warning", "fraud_ban"],
+      staff_role: ["admin", "moderator", "support"],
+      subscription_status: [
+        "created",
+        "authenticated",
+        "active",
+        "pending",
+        "halted",
+        "cancelled",
+        "completed",
+        "expired",
+      ],
+      verification_status: [
+        "awaiting_photo",
+        "pending",
+        "approved",
+        "rejected",
+      ],
+    },
+  },
+} as const;
