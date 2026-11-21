@@ -67,6 +67,10 @@ export const publicEnv = {
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishableKey(),
   NEXT_PUBLIC_SUPPORT_EMAIL: supportEmail(),
   NEXT_PUBLIC_AUTH_PROVIDERS: authProviders(),
+  /** Web push public key (VAPID); push is offered only when set. */
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: cleanValue(
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+  ),
 } as const;
 
 /** True only when Supabase has been configured. Features that need it say so instead of pretending. */

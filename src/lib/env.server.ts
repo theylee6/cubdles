@@ -12,7 +12,8 @@ type SecretName =
   | "NOTIFY_DISPATCH_SECRET"
   | "RESEND_API_KEY"
   | "RAZORPAY_KEY_SECRET"
-  | "RAZORPAY_WEBHOOK_SECRET";
+  | "RAZORPAY_WEBHOOK_SECRET"
+  | "VAPID_PRIVATE_KEY";
 
 function secret(name: SecretName, minLength: number): string | undefined {
   const v = cleanValue(process.env[name]);
@@ -36,4 +37,6 @@ export const serverEnv = {
   RAZORPAY_KEY_ID: cleanValue(process.env.RAZORPAY_KEY_ID),
   RAZORPAY_KEY_SECRET: secret("RAZORPAY_KEY_SECRET", 10),
   RAZORPAY_WEBHOOK_SECRET: secret("RAZORPAY_WEBHOOK_SECRET", 8),
+  VAPID_PRIVATE_KEY: secret("VAPID_PRIVATE_KEY", 20),
+  VAPID_SUBJECT: cleanValue(process.env.VAPID_SUBJECT) ?? "https://cubdles.com",
 } as const;

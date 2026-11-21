@@ -558,6 +558,7 @@ export type Database = {
       notification_outbox: {
         Row: {
           attempts: number;
+          channel: Database["public"]["Enums"]["notification_channel"];
           claimed_at: string | null;
           created_at: string;
           id: number;
@@ -571,6 +572,7 @@ export type Database = {
         };
         Insert: {
           attempts?: number;
+          channel?: Database["public"]["Enums"]["notification_channel"];
           claimed_at?: string | null;
           created_at?: string;
           id?: never;
@@ -584,6 +586,7 @@ export type Database = {
         };
         Update: {
           attempts?: number;
+          channel?: Database["public"]["Enums"]["notification_channel"];
           claimed_at?: string | null;
           created_at?: string;
           id?: never;
@@ -610,18 +613,24 @@ export type Database = {
           email_matches: boolean;
           email_messages: boolean;
           profile_id: string;
+          push_matches: boolean;
+          push_messages: boolean;
           updated_at: string;
         };
         Insert: {
           email_matches?: boolean;
           email_messages?: boolean;
           profile_id: string;
+          push_matches?: boolean;
+          push_messages?: boolean;
           updated_at?: string;
         };
         Update: {
           email_matches?: boolean;
           email_messages?: boolean;
           profile_id?: string;
+          push_matches?: boolean;
+          push_messages?: boolean;
           updated_at?: string;
         };
         Relationships: [
@@ -1112,6 +1121,47 @@ export type Database = {
         };
         Relationships: [];
       };
+      push_subscriptions: {
+        Row: {
+          auth: string;
+          created_at: string;
+          endpoint: string;
+          id: string;
+          last_used_at: string | null;
+          p256dh: string;
+          profile_id: string;
+          user_agent: string | null;
+        };
+        Insert: {
+          auth: string;
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          last_used_at?: string | null;
+          p256dh: string;
+          profile_id: string;
+          user_agent?: string | null;
+        };
+        Update: {
+          auth?: string;
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          last_used_at?: string | null;
+          p256dh?: string;
+          profile_id?: string;
+          user_agent?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       reports: {
         Row: {
           action: string | null;
@@ -1382,6 +1432,7 @@ export type Database = {
       claim_notifications: {
         Args: { p_limit?: number };
         Returns: {
+          channel: Database["public"]["Enums"]["notification_channel"];
           email: string;
           id: number;
           kind: Database["public"]["Enums"]["notification_kind"];
@@ -1461,6 +1512,19 @@ export type Database = {
       };
       profile_age: { Args: { target: string }; Returns: number };
       profile_cards: { Args: { p_ids: string[] }; Returns: Json };
+      push_result: {
+        Args: { p_gone?: boolean; p_id: string; p_ok: boolean };
+        Returns: undefined;
+      };
+      push_targets: {
+        Args: { p_profile: string };
+        Returns: {
+          auth: string;
+          endpoint: string;
+          id: string;
+          p256dh: string;
+        }[];
+      };
       rate_limit_hit: {
         Args: {
           p_bucket: string;
@@ -1473,6 +1537,15 @@ export type Database = {
       reorder_photos: { Args: { p_ids: string[] }; Returns: undefined };
       request_account_deletion: { Args: never; Returns: undefined };
       restore_account: { Args: never; Returns: undefined };
+      save_push_subscription: {
+        Args: {
+          p_auth: string;
+          p_endpoint: string;
+          p_p256dh: string;
+          p_user_agent?: string;
+        };
+        Returns: undefined;
+      };
       search_cities: {
         Args: { p_limit?: number; p_query: string };
         Returns: {
@@ -1517,6 +1590,10 @@ export type Database = {
       set_paused: { Args: { p_paused: boolean }; Returns: undefined };
       set_profile_interests: { Args: { p_ids: number[] }; Returns: undefined };
       set_profile_prompts: { Args: { p_answers: Json }; Returns: undefined };
+      set_push_settings: {
+        Args: { p_push_matches: boolean; p_push_messages: boolean };
+        Returns: undefined;
+      };
       set_timezone: { Args: { p_timezone: string }; Returns: undefined };
       staff_decide_verification: {
         Args: { p_approve: boolean; p_note?: string; p_request: string };
@@ -1658,6 +1735,7 @@ export type Database = {
       like_kind: "like" | "super";
       match_end_reason: "unmatch" | "block" | "moderation" | "account_deleted";
       moderation_status: "pending" | "approved" | "rejected";
+      notification_channel: "email" | "push";
       notification_kind: "match" | "message" | "fraud_ban";
       profile_status:
         "onboarding" | "active" | "paused" | "suspended" | "banned" | "deleted";
@@ -1824,6 +1902,7 @@ export const Constants = {
       like_kind: ["like", "super"],
       match_end_reason: ["unmatch", "block", "moderation", "account_deleted"],
       moderation_status: ["pending", "approved", "rejected"],
+      notification_channel: ["email", "push"],
       notification_kind: ["match", "message", "fraud_ban"],
       profile_status: [
         "onboarding",

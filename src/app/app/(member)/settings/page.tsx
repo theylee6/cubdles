@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/primitives";
 import { getSafetyAdvisory } from "@/features/member/safety";
 import { SafetyAdvisoryNotice } from "@/features/member/safety-advisory";
 import { getStaffRoles } from "@/lib/auth/staff";
+import { PushSettings } from "@/features/push/push-settings";
+import { publicEnv } from "@/lib/env";
 import { CancelMembershipButton } from "@/features/billing/components/cancel-button";
 import { getMembership } from "@/features/billing/data";
 import { formatMoney } from "@/lib/utils";
@@ -46,7 +48,7 @@ async function Settings() {
   ]);
   const { data: emailPrefs } = await supabase
     .from("notification_settings")
-    .select("email_matches, email_messages")
+    .select("email_matches, email_messages, push_matches, push_messages")
     .eq("profile_id", me.id)
     .maybeSingle();
   const [advisory, staffRoles, membership] = await Promise.all([
@@ -137,6 +139,17 @@ async function Settings() {
             </Link>
           </p>
         )}
+      </Card>
+
+      <Card className="flex flex-col gap-2">
+        <h2 className="text-xl">Notifications</h2>
+        <PushSettings
+          publicKey={publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY}
+          initial={{
+            matches: emailPrefs?.push_matches ?? true,
+            messages: emailPrefs?.push_messages ?? true,
+          }}
+        />
       </Card>
 
       <Card>

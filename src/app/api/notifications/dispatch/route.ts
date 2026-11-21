@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { dispatchNotifications } from "@/features/notifications/dispatch";
 import { bearerMatches } from "@/features/notifications/tokens";
 import { isEmailConfigured } from "@/lib/email";
+import { isPushConfigured } from "@/lib/push";
 import { serverEnv } from "@/lib/env.server";
 
 /**
@@ -18,8 +19,8 @@ async function handle(request: NextRequest) {
   ) {
     return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   }
-  // Without an email provider, leave everything queued so nothing is lost.
-  if (!isEmailConfigured() || !serverEnv.SUPABASE_SERVICE_ROLE_KEY) {
+  // With no channel set up, leave everything queued so nothing is lost.
+  if ((!isEmailConfigured() && !isPushConfigured()) || !serverEnv.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ configured: false }, { status: 503 });
   }
   try {

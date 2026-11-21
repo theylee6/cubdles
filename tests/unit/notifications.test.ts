@@ -36,3 +36,12 @@ describe("email templates", () => {
     expect(e.text).toContain("help@cubdles.com");
   });
 });
+
+describe("push payloads", () => {
+  it("never include message content and deep-link to the chat", async () => {
+    const { pushPayload } = await import("@/features/notifications/templates");
+    const p = pushPayload({ kind: "message", other_name: "Xav", ref_id: "m1" });
+    expect(p).toEqual({ title: "Xav", body: "Sent you a message", url: "/app/matches/m1", tag: "chat-m1" });
+    expect(pushPayload({ kind: "fraud_ban", other_name: "Sam", ref_id: "n1" }).title).toMatch(/safety/i);
+  });
+});

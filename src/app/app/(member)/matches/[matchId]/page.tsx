@@ -5,6 +5,7 @@ import { PageSkeleton } from "@/features/member/page-header";
 import { Chat } from "@/features/messaging/components/chat";
 import { getConversation, getMemberTimeZone } from "@/features/messaging/data";
 import { requireActiveMember } from "@/lib/auth/member";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Messages" };
 
@@ -26,9 +27,11 @@ async function Conversation({
   const { matchId } = await params;
   if (!z.uuid().safeParse(matchId).success) notFound();
   const me = await requireActiveMember(`/app/matches/${matchId}`);
-  const [conversation, timeZone] = await Promise.all([
+  const supabase = await createClient();
+  const [conversation, timeZone, { data: privacy }] = await Promise.all([
     getConversation(matchId, me.id),
     getMemberTimeZone(me.id),
+    supabase.from("privacy_settings").select("show_online_status").eq("profile_id", me.id).maybeSingle(),
   ]);
   // Ended, blocked, or not yours: all look the same.
   if (!conversation) notFound();
@@ -50,6 +53,7 @@ async function Conversation({
       initialSeenAt={conversation.seenAt}
       timeZone={timeZone}
       nowIso={new Date().toISOString()}
+      shareOnline={privacy?.show_online_status ?? true}
     />
   );
 }

@@ -33,6 +33,7 @@ import {
   normalizeTimestamp,
   timeLabel,
 } from "../copy";
+import { usePresence } from "../use-presence";
 import type { ChatMessage, Message } from "../types";
 
 export type ChatProps = {
@@ -51,6 +52,8 @@ export type ChatProps = {
   nowIso: string;
   /** Turn off live updates (used by the development preview). */
   live?: boolean;
+  /** Whether I share my online status (privacy setting). */
+  shareOnline?: boolean;
 };
 
 const POLL_MS = 15_000;
@@ -66,8 +69,18 @@ export function Chat({
   timeZone,
   nowIso,
   live = true,
+  shareOnline = true,
 }: ChatProps) {
   const router = useRouter();
+  const { otherOnline, otherTyping, notifyTyping, notifyStopped } = usePresence(
+    {
+      matchId,
+      meId,
+      otherId: other.id,
+      shareOnline,
+      enabled: live,
+    },
+  );
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     initialMessages.map((m) => ({ ...m, status: "sent" })),
   );
@@ -266,6 +279,7 @@ export function Chat({
     };
     stickToBottom.current = true;
     setDraft("");
+    notifyStopped();
     setMessages((cur) => [...cur, pending]);
     void deliver(pending);
   }
@@ -377,7 +391,18 @@ export function Chat({
               {other.name}
               {other.age ? `, ${other.age}` : ""}
             </span>
-            <span className="block text-xs text-mocha">View profile</span>
+            <span className="block text-xs text-mocha">
+              {otherTyping ? (
+                <span className="text-clay">typing…</span>
+              ) : otherOnline ? (
+                <span className="inline-flex items-center gap-1">
+                  <span className="size-2 rounded-full bg-sage" aria-hidden />{" "}
+                  Online now
+                </span>
+              ) : (
+                "View profile"
+              )}
+            </span>
           </span>
         </Link>
         <Button
@@ -525,7 +550,10 @@ export function Chat({
           <textarea
             id="message"
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              if (e.target.value) notifyTyping();
+            }}
             onKeyDown={onKeyDown}
             rows={1}
             maxLength={MAX_MESSAGE_LENGTH}

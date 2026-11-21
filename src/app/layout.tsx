@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { publicEnv } from "@/lib/env";
 import "./globals.css";
+import { RegisterServiceWorker } from "@/features/push/register-sw";
 
 // Self-hosted variable fonts (no runtime request to Google).
 const fraunces = localFont({
@@ -46,8 +47,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${figtree.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-cream text-cocoa">{children}</body>
+    <html
+      lang="en"
+      className={`${fraunces.variable} ${figtree.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col bg-cream text-cocoa">
+        {children}
+        <RegisterServiceWorker />
+      </body>
     </html>
   );
 }

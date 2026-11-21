@@ -130,3 +130,39 @@ export function fraudBanEmail(p: {
     ].join("\n\n"),
   };
 }
+
+export type PushPayload = {
+  title: string;
+  body: string;
+  url: string;
+  tag?: string;
+};
+
+/** Push text. Like emails, never includes message content. */
+export function pushPayload(n: {
+  kind: "match" | "message" | "fraud_ban";
+  other_name: string | null;
+  ref_id: string;
+}): PushPayload {
+  const name = n.other_name?.trim() || "Someone";
+  if (n.kind === "match")
+    return {
+      title: "It's a match!",
+      body: `You and ${name} both said yes. Say hello.`,
+      url: `/app/matches/${n.ref_id}`,
+      tag: `match-${n.ref_id}`,
+    };
+  if (n.kind === "message")
+    return {
+      title: name,
+      body: "Sent you a message",
+      url: `/app/matches/${n.ref_id}`,
+      tag: `chat-${n.ref_id}`,
+    };
+  return {
+    title: "Important safety notice",
+    body: "Someone you talked to was removed for fraud. Tap to read what to do.",
+    url: "/app/discover",
+    tag: `safety-${n.ref_id}`,
+  };
+}
