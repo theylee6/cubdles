@@ -6,7 +6,7 @@ Last updated: 2026-11-20 (all build milestones done; production live at https://
 
 ## Supabase project
 
-- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–13 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
+- Project **cuddles** (`babfmifxyjmesfebzewa`, region ap-northeast-1 Tokyo — owner chose to keep it). Migrations 1–16 applied; 34,246 GeoNames cities (pop. ≥ 15,000, 244 countries) loaded; interests and prompts loaded; no placeholder prices.
 - Live smoke test (rolled back): sign-up trigger, onboarding completion, photo self-approval blocked, location rounding, visibility rules, under-18 suspension, private helpers not callable — 12/12 passed.
 - Security advisor: remaining warnings are the intended app RPCs (each checks `auth.uid()`), and `age_gate_blocks` having no policies by design.
 - Auth configured: Site URL https://cubdles.com, redirect URLs, custom SMTP via Resend (sender no-reply@cubdles.com, domain cubdles.com verified), email limit 100/h. Still to do: Google/Apple providers.
@@ -23,7 +23,9 @@ Last updated: 2026-11-20 (all build milestones done; production live at https://
 | M2 extras | **Done** — profile editing (same step forms in edit mode), privacy settings, pause, incognito (premium-gated), account deletion with 30-day restore + daily purge job |
 | M4 Messaging | **Done** — conversations on match, real-time delivery (with polling fallback), optimistic sending with retry, read receipts (mutual, respects privacy), unread badge, unmatch/block from chat, flood limits. Email/push notifications and reporting from chat move to M5 |
 | M5 Safety | **Done** — report from profiles and chats (with optional block, urgent triage), photo moderation queue, reports queue with conversation context, warn/suspend/ban with audit log, fraud-ban notices in-app and by email (15 U.S.C. 45g), warnings |
-| Notifications | **Done** — match/message/fraud-ban emails via Resend with quiet rules, preferences, one-click unsubscribe; scheduler live in production (sends once `RESEND_API_KEY` is set) |
+| Notifications | **Done** — email (Resend) and web push for matches, messages and fraud-ban notices; quiet rules (push after 30 s unless read, email after 10 min unless read/active; per-conversation cooldowns), preferences per channel, one-click unsubscribe. Scheduler runs every 30 s and only calls the app when something is due. Push is live now; email starts when `RESEND_API_KEY` is set |
+| PWA | **Done** — installable (manifest + PNG/maskable icons + service worker), offline page, push notifications (iPhone: after Add to Home Screen) |
+| Chat extras | **Done** — typing indicator and "Online now" over a private Realtime channel (only the two matched members can join; respects "show online status") |
 | M6 Payments | **Done (needs keys + prices)** — Razorpay subscriptions: checkout, signature verification, webhooks, cancel at period end, plan from subscription, upgrade page, membership settings |
 | M7 Verification | **Photo verification done** (pose selfie, moderator review, badge, selfie deleted after review). UK age assurance needs a provider (owner decision) |
 | M8 Hardening | **Done** — CSP + security headers, DB-backed rate limits, download-my-data, social buttons only when enabled, stale-deploy recovery. Not done: error monitoring (needs Sentry), image CDN |
@@ -38,7 +40,7 @@ Last updated: 2026-11-20 (all build milestones done; production live at https://
 - SEO: metadata per page, sitemap, robots, web manifest, icon.
 - Auth: email+password sign-up (server-validated, 18+ and terms confirmation), login, Google/Apple OAuth, email confirm + recovery routes, password reset, sign-out, session refresh in `proxy.ts`, protected `/app`.
 - Database migration 1 with RLS on every table, column-level grants, storage bucket policies, age-gate (under-18 suspended + email blocked), location rounding, onboarding completion checks, audited staff status changes.
-- Tests: 98 unit, 293 database permission/behaviour, 56 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
+- Tests: 99 unit, 309 database permission/behaviour, 56 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
 
 ## Profile set-up (onboarding) — how it works
 
@@ -101,7 +103,7 @@ Build work is complete; what's left needs the owner (see checklist below). Next 
 2. UK age assurance (needs a provider, e.g. Yoti) before UK marketing.
 3. Error monitoring (Sentry) and an image CDN.
 4. Automated photo scanning (image-moderation API) as volume grows.
-5. Regenerate `src/lib/supabase/database.types.ts` from Supabase (types are currently hand-maintained per migration).
+5. Regenerate `src/lib/supabase/database.types.ts` after every migration (now generated from Supabase, not hand-written).
 
 ## Owner checklist
 
@@ -131,7 +133,8 @@ Build work is complete; what's left needs the owner (see checklist below). Next 
 - Fraud-ban emails send only once `RESEND_API_KEY` is set; until then notices are in-app only (and queued for email).
 - No automated photo scanning yet: every photo is reviewed by a person. Add an image-moderation provider before volume grows.
 - UK: highly effective age assurance for UK members is needed before UK launch (decision G2). Photo verification is not age assurance.
-- Verified badge isn't revoked when photos change; re-verification on photo change is a future improvement.
+- Adding a photo removes the Verified badge (member re-verifies). Deleting or reordering photos keeps it.
+- Account purge deletes profile photos and verification selfies; a daily sweep removes orphaned files.
 - Razorpay flow is built against the documented API but untested end to end until test keys exist: run one test-mode purchase before going live.
 - India-based company: EU/UK representatives, EU OSS and UK VAT registration, GST LUT for exports, Razorpay international + subscriptions activation, legal review — owner actions.
 - English only; strings are not yet extracted for translation (G1).

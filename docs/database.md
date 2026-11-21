@@ -131,6 +131,16 @@ Functions: `discover`, `profile_cards`, `swipe`, `undo_last_pass`, `unmatch`, `l
 | `my_membership`, `upsert_subscription`, `update_subscription_status` | Member view; server-only writes |
 | plans `free`, `plus` + entitlements | What each plan includes (prices added by the owner) |
 
+## Migrations 14–16 — housekeeping, presence, push
+
+| Object | Purpose |
+| --- | --- |
+| trigger `photos_reset_verification` | New photo clears `verified_at` |
+| `orphaned_storage_files()` | Server-only list of unreferenced files for the daily sweep |
+| policies on `realtime.messages` | Private `chat-presence:<match>` channels for typing / online, match members only |
+| `notification_outbox.channel`, `notification_settings.push_*`, `push_subscriptions` | Web push alongside email |
+| `save_push_subscription`, `set_push_settings`, `push_targets`, `push_result` | Device registration (members) and sending (server only) |
+
 ## Coming in later migrations
 
 Messaging, notifications, billing (`subscriptions`, `payments`, `payment_events`, `refunds`), trust (`reports`, `verifications`, `moderation_actions`, `appeals`, `risk_signals`), analytics — as in the Phase 1 plan.

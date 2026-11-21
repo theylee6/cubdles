@@ -42,12 +42,16 @@ The site runs without Supabase configured: public pages work, and anything that 
    - Apple: needs an Apple Developer membership ($99/yr), a Services ID and key.
    - Then list them in `NEXT_PUBLIC_AUTH_PROVIDERS` (e.g. `google,apple`). Buttons are hidden until then.
 6. **Auth → SMTP:** Supabase's built-in email is rate-limited and for testing only. Production uses Resend SMTP (sender `no-reply@cubdles.com`).
-6a. **Notification emails:** set `RESEND_API_KEY` in Vercel, then run `supabase/setup/notifications.sql` once per project (pg_cron + pg_net + two Vault secrets; the same dispatch secret goes in Vercel as `NOTIFY_DISPATCH_SECRET`). Production is already set up.
+6a. **Notifications (email + push):** push needs `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (generate with `npx web-push generate-vapid-keys`; production is set). Email: set `RESEND_API_KEY` in Vercel, then run `supabase/setup/notifications.sql` once per project (pg_cron + pg_net + two Vault secrets; the same dispatch secret goes in Vercel as `NOTIFY_DISPATCH_SECRET`). Production is already set up.
 7. **Make yourself an admin** (SQL editor, once you've signed up):
    ```sql
    insert into public.staff_roles (user_id, role) select id, 'admin' from auth.users where email = 'you@example.com';
    ```
 8. Copy the project URL, the **publishable** key (`sb_publishable_…`) and the **secret** key into `.env.local` and Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
+
+## Database types
+
+`src/lib/supabase/database.types.ts` is generated: `supabase gen types typescript --project-id babfmifxyjmesfebzewa > src/lib/supabase/database.types.ts` after each migration.
 
 ## Development previews
 
