@@ -40,7 +40,7 @@ Last updated: 2026-11-20 (all build milestones done; production live at https://
 - SEO: metadata per page, sitemap, robots, web manifest, icon.
 - Auth: email+password sign-up (server-validated, 18+ and terms confirmation), login, Google/Apple OAuth, email confirm + recovery routes, password reset, sign-out, session refresh in `proxy.ts`, protected `/app`.
 - Database migration 1 with RLS on every table, column-level grants, storage bucket policies, age-gate (under-18 suspended + email blocked), location rounding, onboarding completion checks, audited staff status changes.
-- Tests: 99 unit, 309 database permission/behaviour, 56 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
+- Tests: 99 unit, 309 database permission/behaviour, 58 end-to-end (mobile + desktop, axe WCAG 2.2 AA). Live smoke tests on the Supabase project after each migration.
 
 ## Profile set-up (onboarding) — how it works
 
@@ -109,13 +109,13 @@ Build work is complete; what's left needs the owner (see checklist below). Next 
 
 | # | What | Where | Unblocks |
 | --- | --- | --- | --- |
-| 1 | Make yourself admin (SQL in README step 7) | Supabase SQL editor | /admin, approving photos (nobody appears in Discover until a photo is approved) |
-| 2 | Add `RESEND_API_KEY` | Resend → Vercel env | Match/message/fraud-ban emails (scheduler already running) |
-| 3 | Delete duplicate Vercel projects (keep `cubdles-o79f`) | Vercel | Tidiness, avoids wrong deploys |
+| ~~1~~ | **Done 21 Nov** — Make yourself admin (SQL in README step 7) | Supabase SQL editor | /admin, approving photos (nobody appears in Discover until a photo is approved) |
+| ~~2~~ | **Done 21 Nov** — Add `RESEND_API_KEY` | Resend → Vercel env | Match/message/fraud-ban emails (scheduler already running) |
+| ~~3~~ | **Done 21 Nov** — Delete duplicate Vercel projects (keep `cubdles-o79f`) | Vercel | Tidiness, avoids wrong deploys |
 | 4 | Razorpay: activate account, Subscriptions + International; create the 8 Plus plans below; add keys + webhook; link each plan id (README "Payments") | Razorpay, Vercel, SQL editor | Selling Plus |
 | 5 | ~~Decide Plus prices~~ **Decided 20 Nov:** ₹499/mo, ₹2,099/6 mo; $9.99/mo, $41.99/6 mo; €9.99/mo, €41.99/6 mo; £8.99/mo, £37.99/6 mo. Stored in `plan_prices`, inactive until linked | Done | — |
 | 6 | Google sign-in (optional), then `NEXT_PUBLIC_AUTH_PROVIDERS=google` | Google Cloud, Supabase, Vercel | Google button |
-| 7 | Optional: set `NEXT_PUBLIC_SUPPORT_EMAIL` to a monitored inbox | Vercel | Support address on site and in safety emails |
+| 7 | Set `NEXT_PUBLIC_BUSINESS_NAME`, `NEXT_PUBLIC_BUSINESS_ADDRESS`, `NEXT_PUBLIC_SUPPORT_EMAIL` | Vercel | Business details on /contact and /refunds (Razorpay review), support address in emails |
 | 8 | Lawyer + CA: finalise Terms/Privacy, refund policy, grievance officer, GST LUT, EU OSS/UK VAT, EU/UK representatives, sanctions list | External | Launch compliance |
 | 9 | **Decided 20 Nov:** UK stays open but is not marketed; choose an age-assurance provider before any UK promotion (G2) | You | UK marketing |
 | 10 | Staff the moderation queue (who reviews, how fast; police escalation) | You | Launch |
@@ -134,6 +134,8 @@ Build work is complete; what's left needs the owner (see checklist below). Next 
 - No automated photo scanning yet: every photo is reviewed by a person. Add an image-moderation provider before volume grows.
 - UK: highly effective age assurance for UK members is needed before UK launch (decision G2). Photo verification is not age assurance.
 - Adding a photo removes the Verified badge (member re-verifies). Deleting or reordering photos keeps it.
+- Deleting an account stops Plus renewing (kept to period end); the 30-day purge never removes an account Razorpay could still charge.
+- `/refunds`: refund & cancellation policy (draft for lawyer review).
 - Account purge deletes profile photos and verification selfies; a daily sweep removes orphaned files.
 - Razorpay flow is built against the documented API but untested end to end until test keys exist: run one test-mode purchase before going live.
 - India-based company: EU/UK representatives, EU OSS and UK VAT registration, GST LUT for exports, Razorpay international + subscriptions activation, legal review — owner actions.

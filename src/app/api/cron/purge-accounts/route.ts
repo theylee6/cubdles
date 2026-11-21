@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serverEnv } from "@/lib/env.server";
+import { stopRenewals } from "@/lib/payments/stop-renewals";
 import { createServiceClient } from "@/lib/supabase/server";
 
 /**
  * Daily job: permanently deletes accounts whose deletion was requested more than 30 days ago.
- * Removes their photos from storage, then deletes the auth user (which cascades to all profile data).
+ * Stops any Plus renewal, removes their photos from storage, then deletes the auth user (which cascades to all profile data).
  * Protected by CRON_SECRET (Vercel Cron sends it as a Bearer token).
  */
 export async function GET(request: NextRequest) {
@@ -26,6 +27,11 @@ export async function GET(request: NextRequest) {
 
   const results: { id: string; ok: boolean; step?: string }[] = [];
   for (const { profile_id: id } of due ?? []) {
+    // Never remove an account (and its billing records) while Razorpay could still charge it.
+    if (!(await stopRenewals(id))) {
+      results.push({ id, ok: false, step: "billing" });
+      continue;
+    }
     let storageOk = true;
     for (const bucket of ["profile-photos", "verification-selfies"]) {
       const { data: files } = await admin.storage.from(bucket).list(id, { limit: 1000 });

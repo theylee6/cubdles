@@ -24,6 +24,7 @@ const GROUPS = [
     links: [
       { href: "/terms", label: "Terms" },
       { href: "/privacy", label: "Privacy" },
+      { href: "/refunds", label: "Refunds & cancellation" },
     ],
   },
 ];

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { FormState } from "@/lib/auth/schemas";
 import { getSessionUser } from "@/lib/auth/session";
+import { stopRenewals } from "@/lib/payments/stop-renewals";
 import { createClient } from "@/lib/supabase/server";
 
 async function ctx() {
@@ -99,13 +100,16 @@ export async function requestDeletion(
   ) {
     return { ok: false, errors: { confirm: "Type DELETE to confirm." } };
   }
-  const { supabase } = await ctx();
+  const { user, supabase } = await ctx();
   const { error } = await supabase.rpc("request_account_deletion");
   if (error)
     return {
       ok: false,
       message: "We couldn't delete your account just now. Please contact us.",
     };
+  // Stop Plus renewing (kept until the paid period ends). If Razorpay is unreachable,
+  // the daily purge retries before the account is removed.
+  await stopRenewals(user.id);
   redirect("/app/restore?requested=1");
 }
 

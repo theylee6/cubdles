@@ -11,6 +11,7 @@ const PAGES: [string, RegExp][] = [
   ["/contact", /love to hear from you/i],
   ["/guidelines", /be kind, be real, ask first/i],
   ["/terms", /terms and conditions/i],
+  ["/refunds", /refunds and cancellation/i],
   ["/privacy", /privacy policy/i],
   ["/join", /come on in/i],
   ["/login", /welcome back/i],

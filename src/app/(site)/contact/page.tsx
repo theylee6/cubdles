@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EnvelopeIllustration } from "@/components/illustrations";
+import { BusinessDetails } from "@/components/site/business-details";
 import { PageHero } from "@/components/site/page-parts";
 import { Card, Container } from "@/components/ui/primitives";
 import { ContactForm } from "./contact-form";
@@ -30,6 +31,7 @@ export default function ContactPage() {
             profile or in your chat — it attaches the details our moderators
             need.
           </p>
+          <BusinessDetails />
         </div>
       </Container>
     </>

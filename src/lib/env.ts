@@ -67,6 +67,11 @@ export const publicEnv = {
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishableKey(),
   NEXT_PUBLIC_SUPPORT_EMAIL: supportEmail(),
   NEXT_PUBLIC_AUTH_PROVIDERS: authProviders(),
+  /** Registered business name and address, shown on Contact and Refunds (required by payment providers). */
+  NEXT_PUBLIC_BUSINESS_NAME: cleanValue(process.env.NEXT_PUBLIC_BUSINESS_NAME),
+  NEXT_PUBLIC_BUSINESS_ADDRESS: cleanValue(
+    process.env.NEXT_PUBLIC_BUSINESS_ADDRESS,
+  ),
   /** Web push public key (VAPID); push is offered only when set. */
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: cleanValue(
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,

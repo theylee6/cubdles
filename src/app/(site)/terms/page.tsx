@@ -28,7 +28,7 @@ export default function TermsPage() {
           <p>You agree to follow our <Link href="/guidelines">community guidelines</Link>. We may remove content or suspend or close accounts that break them. You can appeal these decisions.</p>
 
           <h2>5. Paid membership</h2>
-          <p>Paid features are optional. Prices, billing period and renewal terms are shown before you pay. Memberships renew automatically until cancelled; you can cancel any time and keep your features until the end of the period you&rsquo;ve paid for. Refunds follow our refund policy and applicable law.</p>
+          <p>Paid features are optional. Prices, billing period and renewal terms are shown before you pay. Memberships renew automatically until cancelled; you can cancel any time and keep your features until the end of the period you&rsquo;ve paid for. Refunds follow our <Link href="/refunds">refund and cancellation policy</Link> and applicable law.</p>
 
           <h2>6. Safety</h2>
           <p>We review reports and take safety seriously, but <strong>we don&rsquo;t run criminal background checks</strong> on members, and we can&rsquo;t guarantee the behaviour of other members. Please follow the advice in our <Link href="/safety">Safety centre</Link>.</p>
