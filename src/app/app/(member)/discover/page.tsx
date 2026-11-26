@@ -8,6 +8,7 @@ import { SwipeDeck } from "@/features/discovery/components/swipe-deck";
 import { PageHeader, PageSkeleton } from "@/features/member/page-header";
 import { getSafetyAdvisory } from "@/features/member/safety";
 import { SafetyAdvisoryNotice } from "@/features/member/safety-advisory";
+import { VisibilityNotice } from "@/features/member/visibility";
 import { requireActiveMember } from "@/lib/auth/member";
 
 export const metadata = { title: "Discover" };
@@ -39,6 +40,7 @@ async function Discover() {
         }
       />
       <SafetyAdvisoryNotice advisory={advisory} className="mb-4" />
+      <VisibilityNotice memberId={member.id} className="mb-4" />
     </>
   );
 

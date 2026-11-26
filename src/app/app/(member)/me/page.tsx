@@ -7,6 +7,7 @@ import { getCards } from "@/features/discovery/data";
 import { PageHeader, PageSkeleton } from "@/features/member/page-header";
 import { SavedNotice } from "@/features/settings/saved-notice";
 import { EDIT_SECTIONS } from "@/features/settings/sections";
+import { VisibilityNotice } from "@/features/member/visibility";
 import { requireActiveMember } from "@/lib/auth/member";
 import { VerificationCard } from "@/features/verification/components/verification-card";
 import { getVerificationState } from "@/features/verification/data";
@@ -43,6 +44,7 @@ async function Me() {
         }
       />
       <SavedNotice />
+      <VisibilityNotice memberId={me.id} className="mb-6" />
       <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
         <div className="mx-auto w-full max-w-md">
           {card ? <ProfileView card={card} /> : null}
